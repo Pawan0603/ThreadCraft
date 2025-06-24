@@ -9,6 +9,7 @@ export function withAuth(handler: (req: AuthenticatedRequest) => Promise<NextRes
   return async (req: AuthenticatedRequest): Promise<NextResponse> => {
     try {
       const authHeader = req.headers.get("authorization")
+      console.log("Authorization Header:", authHeader);
       const token = authHeader?.startsWith("Bearer ") ? authHeader.substring(7) : null
 
       if (!token) {

@@ -89,10 +89,12 @@ async function createProduct(req: AuthenticatedRequest) {
     }
 
     // Check if category exists
-    const categoryExists = await Category.findById(category)
+    const categoryExists = await Category.find({ name: category });
     if (!categoryExists) {
       return NextResponse.json({ error: "Category not found" }, { status: 404 })
     }
+
+    console.log("Creating product with data:", productData)
 
     // Generate slug from name
     const slug = name
@@ -102,6 +104,7 @@ async function createProduct(req: AuthenticatedRequest) {
 
     // Check if slug already exists
     const existingProduct = await Product.findOne({ slug })
+    console.log("Existing product with slug:", existingProduct)
     if (existingProduct) {
       return NextResponse.json({ error: "Product with this name already exists" }, { status: 409 })
     }
@@ -111,6 +114,7 @@ async function createProduct(req: AuthenticatedRequest) {
       slug,
       createdBy: req.user!.userId,
     })
+    console.log("New product data:", product)
 
     await product.save()
     await product.populate("category", "name slug")

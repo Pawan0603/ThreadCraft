@@ -7,7 +7,7 @@ export interface IProductVariant {
   sku: string
   stock: number
   price?: number
-  images?: string[]
+  images?: string[] | null;
 }
 
 export interface IProduct extends Document {
