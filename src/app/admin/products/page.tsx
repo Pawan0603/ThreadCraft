@@ -13,6 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Plus, Search, Edit, Trash2, Eye, ArrowUpDown, CheckCircle } from "lucide-react"
 import { getAllProducts } from "@/lib/products"
 import type { Product } from "@/lib/types"
+import axios from "axios"
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -23,11 +24,29 @@ export default function AdminProductsPage() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
   const [selectedProducts, setSelectedProducts] = useState<string[]>([])
   const [notification, setNotification] = useState<string | null>(null)
+  const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
 
   useEffect(() => {
-    const allProducts = getAllProducts()
-    setProducts(allProducts)
-    setFilteredProducts(allProducts)
+    // const allProducts = getAllProducts()
+
+    const getProducts = async () => {
+      console.log("Fetching products from API...")
+      const response = await axios.get("/api/products",
+        {
+          params: {
+            page: 1,
+            limit: 100, // Fetch all products for initial load
+            sortBy,
+            sortOrder,
+          },
+        },
+      )
+      const data = response.data
+      console.log("Fetched products:", data)
+      setProducts(data.products)
+      setFilteredProducts(data.products)
+    }
+    getProducts()
   }, [])
 
   useEffect(() => {
@@ -38,14 +57,14 @@ export default function AdminProductsPage() {
       filtered = filtered.filter(
         (product) =>
           product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          product.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           product.description.toLowerCase().includes(searchQuery.toLowerCase()),
       )
     }
 
     // Apply category filter
     if (categoryFilter !== "all") {
-      filtered = filtered.filter((product) => product.category === categoryFilter)
+      filtered = filtered.filter((product) => product.category.name === categoryFilter)
     }
 
     // Apply sorting
@@ -72,16 +91,33 @@ export default function AdminProductsPage() {
 
   const handleDeleteProduct = (productId: string) => {
     if (confirm("Are you sure you want to delete this product?")) {
-      setProducts(products.filter((product) => product.id !== productId))
-      setNotification("Product deleted successfully!")
-      setTimeout(() => setNotification(null), 3000)
+      // Call API to delete product
+      axios.delete(`/api/products/${productId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+        .then(() => {
+          console.log(`Product ${productId} deleted successfully`)
+          // Update state to remove deleted product
+          setProducts(products.filter((product) => product._id !== productId))
+          setNotification("Product deleted successfully!")
+          setTimeout(() => setNotification(null), 3000)
+        })
+        .catch((error) => {
+          console.error("Error deleting product:", error)
+          setNotification("Failed to delete product. Please try again.")
+          setTimeout(() => setNotification(null), 3000)
+          return
+        })
     }
   }
 
   const handleBulkDelete = () => {
     if (selectedProducts.length === 0) return
     if (confirm(`Are you sure you want to delete ${selectedProducts.length} products?`)) {
-      setProducts(products.filter((product) => !selectedProducts.includes(product.id)))
+      setProducts(products.filter((product) => !selectedProducts.includes(product._id)))
       setSelectedProducts([])
       setNotification(`${selectedProducts.length} products deleted successfully!`)
       setTimeout(() => setNotification(null), 3000)
@@ -98,7 +134,7 @@ export default function AdminProductsPage() {
     if (selectedProducts.length === filteredProducts.length) {
       setSelectedProducts([])
     } else {
-      setSelectedProducts(filteredProducts.map((product) => product.id))
+      setSelectedProducts(filteredProducts.map((product) => product._id))
     }
   }
 
@@ -142,15 +178,15 @@ export default function AdminProductsPage() {
                 className="pl-10"
               />
             </div>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value)}>
               <SelectTrigger className="w-full md:w-48">
                 <SelectValue placeholder="Filter by category" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
                 {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
+                  <SelectItem key={category._id} value={category.name}>
+                    {category.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -229,12 +265,12 @@ export default function AdminProductsPage() {
               </TableHeader>
               <TableBody>
                 {filteredProducts.map((product) => (
-                  <TableRow key={product.id}>
+                  <TableRow key={product._id}>
                     <TableCell>
                       <input
                         type="checkbox"
-                        checked={selectedProducts.includes(product.id)}
-                        onChange={() => toggleProductSelection(product.id)}
+                        checked={selectedProducts.includes(product._id)}
+                        onChange={() => toggleProductSelection(product._id)}
                         className="rounded border-gray-300"
                       />
                     </TableCell>
@@ -255,7 +291,7 @@ export default function AdminProductsPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">{product.category}</Badge>
+                      <Badge variant="outline">{product.category.name}</Badge>
                     </TableCell>
                     <TableCell>${product.price.toFixed(2)}</TableCell>
                     <TableCell>
@@ -276,12 +312,12 @@ export default function AdminProductsPage() {
                             <Eye className="h-4 w-4" />
                           </Button>
                         </Link>
-                        <Link href={`/admin/products/${product.id}/edit`}>
+                        <Link href={`/admin/products/${product._id}/edit`}>
                           <Button variant="outline" size="sm">
                             <Edit className="h-4 w-4" />
                           </Button>
                         </Link>
-                        <Button variant="outline" size="sm" onClick={() => handleDeleteProduct(product.id)}>
+                        <Button variant="outline" size="sm" onClick={() => handleDeleteProduct(product._id)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>

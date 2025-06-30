@@ -1,11 +1,16 @@
 export interface Product {
-  id: string
+  _id: string
   name: string
   slug: string
   description: string
   price: number
   image: string
-  category: string
+  // category: string
+  category: {
+    _id: string
+    name: string
+    slug: string
+  }
   featured?: boolean
   averageRating?: number
   reviewCount?: number
@@ -82,3 +87,9 @@ export interface User {
   avatar?: string
   createdAt: string
 }
+
+export interface Categories {
+    _id: string;
+    name: string;
+    slug: string;
+}[]

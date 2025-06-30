@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     const inStock = searchParams.get("inStock")
 
     // Build query
-    const query: any = { isActive: true }
+    const query: any = { status: "active", visibility: "public" }
 
     if (category) {
       query.category = category
@@ -55,10 +55,12 @@ export async function GET(req: NextRequest) {
     const sortOptions: any = {}
     sortOptions[sortBy] = sortOrder === "desc" ? -1 : 1
 
+
     const [products, total] = await Promise.all([
       Product.find(query).populate("category", "name slug").sort(sortOptions).skip(skip).limit(limit).lean(),
       Product.countDocuments(query),
     ])
+
 
     return NextResponse.json({
       products,
@@ -94,7 +96,6 @@ async function createProduct(req: AuthenticatedRequest) {
       return NextResponse.json({ error: "Category not found" }, { status: 404 })
     }
 
-    console.log("Creating product with data:", productData)
 
     // Generate slug from name
     const slug = name
@@ -104,7 +105,6 @@ async function createProduct(req: AuthenticatedRequest) {
 
     // Check if slug already exists
     const existingProduct = await Product.findOne({ slug })
-    console.log("Existing product with slug:", existingProduct)
     if (existingProduct) {
       return NextResponse.json({ error: "Product with this name already exists" }, { status: 409 })
     }
@@ -114,7 +114,6 @@ async function createProduct(req: AuthenticatedRequest) {
       slug,
       createdBy: req.user!.userId,
     })
-    console.log("New product data:", product)
 
     await product.save()
     await product.populate("category", "name slug")

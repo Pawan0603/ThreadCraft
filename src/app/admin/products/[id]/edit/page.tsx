@@ -33,7 +33,7 @@ interface ProductFormData extends Omit<Product, "id" | "slug" | "createdAt" | "u
   status: "active" | "draft" | "archived"
 }
 
-export default function EditProductPage({ params }: { params: { id: string } }) {
+export default function EditProductPage({ params }: { params: { _id: string } }) {
   const router = useRouter()
   const [product, setProduct] = useState<ProductFormData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -45,7 +45,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   useEffect(() => {
     const fetchProduct = () => {
       try {
-        const productData = getProductById(params.id)
+        const productData = getProductById(params._id)
         if (productData) {
           // Convert to form data format
           const formData: ProductFormData = {
@@ -75,7 +75,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     }
 
     fetchProduct()
-  }, [params.id])
+  }, [params._id])
 
   const handleSave = async () => {
     if (!product) return
