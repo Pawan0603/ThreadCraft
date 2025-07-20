@@ -7,31 +7,31 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 
 export default function Home() {
-  const featuredProducts = getFeaturedProducts()
-  // const [featuredProducts, setFeaturedProducts] = useState([]);
+  // const featuredProducts = getFeaturedProducts()
+  const [featuredProducts, setFeaturedProducts] = useState([]);
 
-  // useEffect(() => {
-  //   const fetchFeaturedProducts = async () => {
-  //     try {
-  //       let res = await axios.get("/api/products", {
-  //         params: {
-  //           featured: true,
-  //         },
-  //       });
+  useEffect(() => {
+    const fetchFeaturedProducts = async () => {
+      try {
+        let res = await axios.get("/api/products", {
+          params: {
+            featured: true,
+          },
+        });
 
-  //       if(res.status === 200){
-  //         setFeaturedProducts(res.data.products);
-  //       }
+        if(res.status === 200){
+          setFeaturedProducts(res.data.products);
+        }
 
-  //       console.log("ress", res);
-  //     } catch (error) {
-  //       console.error("Error fetching featured products:", error);
-  //     }
-  //   }
+        console.log("ress", res);
+      } catch (error) {
+        console.error("Error fetching featured products:", error);
+      }
+    }
 
-  //   fetchFeaturedProducts();
+    fetchFeaturedProducts();
 
-  // }, []);
+  }, []);
 
   return (
     <div className="flex flex-col">
