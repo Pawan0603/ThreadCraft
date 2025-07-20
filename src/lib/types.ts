@@ -4,8 +4,7 @@ export interface Product {
   slug: string
   description: string
   price: number
-  image: string
-  // category: string
+  images: string[]
   category: {
     _id: string
     name: string

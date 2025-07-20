@@ -3,6 +3,7 @@ import Link from "next/link"
 import type { Product } from "@/lib/types"
 import StarRating from "./star-rating"
 import { WishlistButton } from "@/components/wishlist/wishlist-button"
+import { CldImage } from "next-cloudinary"
 
 interface ProductCardProps {
   product: Product
@@ -19,13 +20,20 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
 
       <div className="relative aspect-square overflow-hidden bg-slate-100">
-        <Image
+        {/* <Image
           src={product.image || "/placeholder.svg"}
           alt={product.name}
           fill
           className="object-cover transition-transform duration-300 group-hover:scale-105"
           sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
           priority={product.featured}
+        /> */}
+        <CldImage
+          width="640"
+          height="768"
+          src={product.images[0] || "placeholder.svg"}
+          sizes="100vw"
+          alt="Description of my image"
         />
         {product.isNew && (
           <div className="absolute left-0 top-0 bg-primary px-2 py-1 text-xs font-medium text-white">New</div>
