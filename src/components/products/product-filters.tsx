@@ -5,9 +5,10 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { SearchX } from "lucide-react"
+import { Product } from "@/lib/types"
 
 interface ProductFiltersProps {
-  categories: string[]
+  categories: Product["category"][]
   priceRange: [number, number]
   onCategoryChange: (categories: string[]) => void
   onPriceChange: (range: [number, number]) => void
@@ -76,16 +77,16 @@ export default function ProductFilters({
         ) : (
           <div className="space-y-3">
             {categories.map((category) => (
-              <div key={category} className="flex items-center space-x-2">
+              <div key={category.name} className="flex items-center space-x-2">
                 <Checkbox
-                  id={`category-${category}`}
-                  checked={selectedCategories.includes(category)}
-                  onCheckedChange={(checked) => handleCategoryChange(category, checked === true)}
+                  id={`category-${category.name}`}
+                  checked={selectedCategories.includes(category.name)}
+                  onCheckedChange={(checked) => handleCategoryChange(category.name, checked === true)}
                   className="h-5 w-5"
                 />
-                <Label htmlFor={`category-${category}`} className="text-sm">
-                  {category}
-                </Label>
+                <Label htmlFor={`category-${category.name}`} className="text-sm">
+                  {category.name}
+                </Label>  
               </div>
             ))}
           </div>

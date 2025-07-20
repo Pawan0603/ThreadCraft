@@ -6,10 +6,11 @@ interface ProductGridProps {
 }
 
 export default function ProductGrid({ products }: ProductGridProps) {
+  console.log("products", products);
   return (
     <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
       {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+        <ProductCard key={product._id} product={product} />
       ))}
     </div>
   )

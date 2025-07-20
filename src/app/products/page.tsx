@@ -9,14 +9,35 @@ import type { Product } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { SlidersHorizontal } from "lucide-react"
 import { useMediaQuery } from "@/hooks/use-media-query"
+import axios from "axios"
 
 export default function ProductsPage() {
-  const allProducts = getAllProducts()
+  // const allProducts = getAllProducts()
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(allProducts)
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [selectedPriceRange, setSelectedPriceRange] = useState<[number, number]>([0, 0])
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false)
   const isMobile = useMediaQuery("(max-width: 768px)")
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        let response = await axios.get('/api/products'); // Adjust the endpoint as needed
+        console.log(response.data.products);
+        setAllProducts(response.data.products);
+        setFilteredProducts(response.data.products);
+        // Initialize price range based on fetched products
+        const prices = response.data.products.map((product: Product) => product.price);
+        const minPrice = Math.floor(Math.min(...prices));
+        const maxPrice = Math.ceil(Math.max(...prices));
+        setSelectedPriceRange([minPrice, maxPrice]);
+      } catch (error) {
+        
+      }
+    }
+    fetchProducts();
+  }, []);
 
   // Extract unique categories
   const categories = Array.from(new Set(allProducts.map((product) => product.category)))
@@ -46,7 +67,7 @@ export default function ProductsPage() {
 
     // Filter by category if any are selected
     if (categories.length > 0) {
-      filtered = filtered.filter((product) => categories.includes(product.category))
+      filtered = filtered.filter((product) => categories.includes(product.category.name))
     }
 
     // Filter by price range

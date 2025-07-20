@@ -19,14 +19,14 @@ export function WishlistButton({ product, variant = "default", className }: Wish
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist()
   const [isAnimating, setIsAnimating] = useState(false)
 
-  const inWishlist = isInWishlist(product.id)
+  const inWishlist = isInWishlist(product._id)
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
 
     if (inWishlist) {
-      removeFromWishlist(product.id)
+      removeFromWishlist(product._id)
     } else {
       addToWishlist(product)
       setIsAnimating(true)

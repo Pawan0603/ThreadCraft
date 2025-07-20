@@ -22,7 +22,7 @@ export default function WishlistPage() {
   }
 
   const handleAddToCart = (productId: string) => {
-    const product = wishlistItems.find((item) => item.id === productId)
+    const product = wishlistItems.find((item) => item._id === productId)
     if (product) {
       addToCart(
         {
@@ -74,7 +74,7 @@ export default function WishlistPage() {
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {wishlistItems.map((product) => (
               <div
-                key={product.id}
+                key={product._id}
                 className="group relative overflow-hidden rounded-lg border bg-white transition-all hover:shadow-md"
               >
                 <Link href={`/products/${product.slug}`} className="block">
@@ -98,14 +98,14 @@ export default function WishlistPage() {
                     variant="destructive"
                     size="icon"
                     className="h-8 w-8 rounded-full"
-                    onClick={() => removeFromWishlist(product.id)}
+                    onClick={() => removeFromWishlist(product._id)}
                   >
                     <Trash2 className="h-4 w-4" />
                     <span className="sr-only">Remove from wishlist</span>
                   </Button>
                 </div>
                 <div className="p-4 pt-0">
-                  <Button variant="secondary" size="sm" className="w-full" onClick={() => handleAddToCart(product.id)}>
+                  <Button variant="secondary" size="sm" className="w-full" onClick={() => handleAddToCart(product._id)}>
                     <ShoppingBag className="mr-2 h-4 w-4" />
                     Add to Cart
                   </Button>

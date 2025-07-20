@@ -39,7 +39,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
       <div className="p-3">
         <h3 className="text-sm font-medium line-clamp-1 md:text-base">{product.name}</h3>
-        <p className="mt-1 text-xs text-slate-500 line-clamp-1">{product.category}</p>
+        <p className="mt-1 text-xs text-slate-500 line-clamp-1">{product.category.name}</p>
 
         {product.averageRating && (
           <div className="mt-1 flex items-center gap-1">
