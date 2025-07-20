@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
@@ -12,21 +12,40 @@ import { getReviewsByProductId } from "@/lib/reviews"
 import { MinusIcon, PlusIcon } from "lucide-react"
 import StarRating from "@/components/products/star-rating"
 import ReviewsSection from "@/components/products/reviews-section"
+import { Product } from "@/lib/types"
+import axios from "axios"
+import { CldImage } from "next-cloudinary"
 
-export default function ProductPage({ params }: { params: { slug: string } }) {
+export default function ProductPage() {
   const router = useRouter()
   const { addToCart } = useCart()
-  const product = getProductBySlug(params.slug)
+  const params = useParams();
+  const slug = params?.slug as string; 
+
+  const [product, setProduct] = useState<Product | null>(null);
 
   const [selectedSize, setSelectedSize] = useState("M")
   const [quantity, setQuantity] = useState(1)
   const [reviews, setReviews] = useState([])
 
-  useEffect(() => {
-    if (product) {
-      const productReviews = getReviewsByProductId(product.id)
-      setReviews(productReviews)
+  const fetchProduct = async () => {
+    try {
+      const res = await axios.get(`/api/products/${slug}`)
+      setProduct(res.data.product)
+    } catch (error) {
+      console.error("Error fetching product:", error)
     }
+  }
+
+  useEffect(() => {
+    fetchProduct()
+  }, [slug])
+
+  useEffect(() => {
+    // if (product) {
+    //   const productReviews = getReviewsByProductId(product.id)
+    //   setReviews(productReviews)
+    // }
   }, [product])
 
   if (!product) {
@@ -53,14 +72,22 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
     <div className="container mx-auto px-4 py-8 md:py-12">
       <div className="grid gap-8 md:grid-cols-2">
         {/* Product Image */}
-        <div className="relative aspect-square overflow-hidden rounded-lg bg-slate-100">
-          <Image
+        <div className="relative aspect-square overflow-hidden rounded-lg bg-slate-100 flex items-center justify-center">
+          {/* <Image
             src={product.image || "/placeholder.svg"}
             alt={product.name}
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, 50vw"
             priority
+          /> */}
+          <CldImage
+            width="640"
+            height="768"
+            src={product.images[0] || "placeholder.svg"}
+            sizes="(max-width: 768px) 100vw, 50vw"
+            alt={product.name}
+            className="object-cover"
           />
         </div>
 

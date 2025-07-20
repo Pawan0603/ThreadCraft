@@ -12,7 +12,7 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   return (
     <Link
-      href={`/products/${product.slug}`}
+      href={`/products/${product._id}`}
       className="group relative overflow-hidden rounded-lg border bg-white transition-all hover:shadow-md"
     >
       <div className="absolute right-2 top-2 z-10">

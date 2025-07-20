@@ -7,10 +7,9 @@ import { withAdminAuth, type AuthenticatedRequest } from "@/lib/auth/middleware"
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     await connectDB()
-
     const product = await Product.findById(params.id)
       .populate("category", "name slug")
-      .populate("reviews.user", "name avatar")
+      // .populate("reviews.user", "name avatar")
       .lean()
 
     if (!product) {
