@@ -1,3 +1,5 @@
+import { IProductVariant } from "./models"
+
 export interface Product {
   _id: string
   name: string
@@ -13,6 +15,7 @@ export interface Product {
   featured?: boolean
   averageRating?: number
   reviewCount?: number
+  variants?: IProductVariant[]
 }
 
 export interface Review {

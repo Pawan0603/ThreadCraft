@@ -20,7 +20,7 @@ export default function ProductPage() {
   const router = useRouter()
   const { addToCart } = useCart()
   const params = useParams();
-  const slug = params?.slug as string; 
+  const slug = params?.slug as string;
 
   const [product, setProduct] = useState<Product | null>(null);
 
@@ -32,6 +32,7 @@ export default function ProductPage() {
     try {
       const res = await axios.get(`/api/products/${slug}`)
       setProduct(res.data.product)
+      console.log("Product fetched:", res.data.product);
     } catch (error) {
       console.error("Error fetching product:", error)
     }
@@ -72,23 +73,25 @@ export default function ProductPage() {
     <div className="container mx-auto px-4 py-8 md:py-12">
       <div className="grid gap-8 md:grid-cols-2">
         {/* Product Image */}
-        <div className="relative aspect-square overflow-hidden rounded-lg bg-slate-100 flex items-center justify-center">
-          {/* <Image
-            src={product.image || "/placeholder.svg"}
-            alt={product.name}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 50vw"
-            priority
-          /> */}
-          <CldImage
-            width="640"
-            height="768"
-            src={product.images[0] || "placeholder.svg"}
-            sizes="(max-width: 768px) 100vw, 50vw"
-            alt={product.name}
-            className="object-cover"
-          />
+        <div className={`relative ${product.images.length === 0 ? "aspect-square" : "aspect-auto"} overflow-hidden rounded-lg bg-slate-100 flex items-center justify-center`}>
+          {product.images.length === 0 ? (
+            <Image
+              src="/placeholder.svg"
+              alt="Placeholder image"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              priority
+            />) : (
+            <CldImage
+              width="640"
+              height="768"
+              src={product.images[0] || "placeholder.svg"}
+              sizes="(max-width: 768px) 100vw, 50vw"
+              alt={product.name}
+              className="object-cover"
+            />
+          )}
         </div>
 
         {/* Product Details */}
@@ -115,10 +118,10 @@ export default function ProductPage() {
           <div className="mt-6">
             <h3 className="mb-3 font-medium">Size</h3>
             <RadioGroup defaultValue="M" onValueChange={setSelectedSize} className="flex gap-4">
-              {["S", "M", "L", "XL"].map((size) => (
-                <div key={size} className="flex items-center space-x-2">
-                  <RadioGroupItem value={size} id={`size-${size}`} />
-                  <Label htmlFor={`size-${size}`}>{size}</Label>
+              {product.variants?.map((variant) => (
+                <div key={variant._id} className="flex items-center space-x-2">
+                  <RadioGroupItem value={variant.size} id={`size-${variant._id}`} />
+                  <Label htmlFor={`size-${variant._id}`}>{variant.size}</Label>
                 </div>
               ))}
             </RadioGroup>

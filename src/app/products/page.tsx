@@ -5,7 +5,7 @@ import ProductGrid from "@/components/products/product-grid"
 import ProductFilters from "@/components/products/product-filters"
 import MobileFilterDrawer from "@/components/products/mobile-filter-drawer"
 import { getAllProducts } from "@/lib/products"
-import type { Product } from "@/lib/types"
+import type { Categories, Product } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { SlidersHorizontal } from "lucide-react"
 import { useMediaQuery } from "@/hooks/use-media-query"
@@ -20,6 +20,20 @@ export default function ProductsPage() {
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false)
   const isMobile = useMediaQuery("(max-width: 768px)")
 
+  const [categories, setCategories] = useState<Categories[]>([]);
+
+  const gelAllCategories = async () => {
+    try {
+      const response = await axios.get('/api/categories'); // Adjust the endpoint as needed
+      setCategories(response.data.categories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      setCategories([]);
+      alert("Failed to load categories. Please try again later.");
+      console.error("Error fetching categories:", error);
+    }
+  }
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -33,14 +47,21 @@ export default function ProductsPage() {
         const maxPrice = Math.ceil(Math.max(...prices));
         setSelectedPriceRange([minPrice, maxPrice]);
       } catch (error) {
-        
+        console.error("Error fetching products:", error);
+        setAllProducts([]);
+        setFilteredProducts([]);
+        setSelectedPriceRange([0, 0]); // Reset price range on error
+        setIsFilterDrawerOpen(false); // Close filter drawer on error
+        alert("Failed to load products. Please try again later.");
+        console.error("Error fetching products:", error);
       }
     }
     fetchProducts();
+    gelAllCategories();
   }, []);
 
   // Extract unique categories
-  const categories = Array.from(new Set(allProducts.map((product) => product.category)))
+  // const categories = Array.from(new Set(allProducts.map((product) => product.category)))
 
   // Find min and max prices
   const prices = allProducts.map((product) => product.price)
