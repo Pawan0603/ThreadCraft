@@ -2,12 +2,13 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { addReview } from "@/lib/reviews"
 import StarRatingInput from "./star-rating-input"
 import { useAuth } from "@/components/auth/auth-context"
+import axios from "axios"
 
 interface ReviewFormProps {
   productId: string
@@ -21,7 +22,16 @@ export default function ReviewForm({ productId, onReviewAdded }: ReviewFormProps
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [accessToken, setAccessToken] = useState("");
+
+  useEffect(() => {
+    if(typeof window !== "undefined") {
+      const token = localStorage.getItem("accessToken");
+      setAccessToken(token || "");
+    }
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!user) {
@@ -30,29 +40,72 @@ export default function ReviewForm({ productId, onReviewAdded }: ReviewFormProps
 
     setIsSubmitting(true)
 
-    // In a real app, this would be an API call
-    addReview({
-      productId,
-      userId: user.id,
-      userName: user.name,
-      userAvatar: user.avatar,
-      rating,
-      comment,
-    })
-
-    // Simulate API delay
-    setTimeout(() => {
+    // Here we simulate adding a review
+    if (!productId || !rating) {
+      alert("Product ID and rating are required")
       setIsSubmitting(false)
-      setShowSuccess(true)
-      setRating(5)
-      setComment("")
+      return
+    }
+    if (rating < 1 || rating > 5) {
+      alert("Rating must be between 1 and 5")
+      setIsSubmitting(false)
+      return
+    }
 
-      // Hide success message after 3 seconds
+    try {
+      let res = await axios.post("/api/reviews",
+        {
+          productId,
+          rating,
+          comment,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      )
+      if (res.status === 201) {
+        setIsSubmitting(false)
+        setShowSuccess(true)
+        setRating(5)
+        setComment("")
+      }
+    } catch (error) {
+      console.error("Error submitting review:", error)
+      setIsSubmitting(false)
+      return
+    } finally { // Hide success message after 3 seconds
       setTimeout(() => {
         setShowSuccess(false)
         onReviewAdded()
       }, 3000)
-    }, 1000)
+    }
+
+    // In a real app, this would be an API call
+    // addReview({
+    //   productId,
+    //   userId: user.id,
+    //   userName: user.name,
+    //   userAvatar: user.avatar,
+    //   rating,
+    //   comment,
+    // })
+
+    // Simulate API delay
+    // setTimeout(() => {
+    //   setIsSubmitting(false)
+    //   setShowSuccess(true)
+    //   setRating(5)
+    //   setComment("")
+
+    //   // Hide success message after 3 seconds
+    //   setTimeout(() => {
+    //     setShowSuccess(false)
+    //     onReviewAdded()
+    //   }, 3000)
+    // }, 1000)
   }
 
   return (

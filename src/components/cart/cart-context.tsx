@@ -43,7 +43,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const addToCart = (item: CartItem) => {
     setCartItems((prevItems) => {
       // Check if item already exists in cart with same size
-      const existingItemIndex = prevItems.findIndex((i) => i.id === item.id && i.size === item.size)
+      const existingItemIndex = prevItems.findIndex((i) => i._id === item._id && i.size === item.size)
 
       if (existingItemIndex !== -1) {
         // Update quantity of existing item
@@ -58,12 +58,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }
 
   const removeFromCart = (itemId: string, size: string) => {
-    setCartItems((prevItems) => prevItems.filter((item) => !(item.id === itemId && item.size === size)))
+    setCartItems((prevItems) => prevItems.filter((item) => !(item._id === itemId && item.size === size)))
   }
 
   const updateQuantity = (itemId: string, size: string, quantity: number) => {
     setCartItems((prevItems) =>
-      prevItems.map((item) => (item.id === itemId && item.size === size ? { ...item, quantity } : item)),
+      prevItems.map((item) => (item._id === itemId && item.size === size ? { ...item, quantity } : item)),
     )
   }
 
