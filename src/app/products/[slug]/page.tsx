@@ -47,8 +47,21 @@ export default function ProductPage() {
     //   const productReviews = getReviewsByProductId(product.id)
     //   setReviews(productReviews)
     // }
-  }, [product])
 
+    if (product) {
+      const fetchRecentReviews = async () => {
+        try {
+          const res = await axios.get(`/api/reviews?productId=${product._id}&limit=5`)
+          setReviews(res.data.reviews)
+          // console.log("Recent reviews fetched:", res.data.reviews);
+        } catch (error) {
+          console.error("Error fetching reviews:", error)
+        }
+      }
+      fetchRecentReviews();
+    }
+  }, [product])
+// 
   if (!product) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">

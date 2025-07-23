@@ -9,8 +9,29 @@ interface ReviewCardProps {
 }
 
 export default function ReviewCard({ review }: ReviewCardProps) {
-  const date = new Date(review.date)
-  const timeAgo = formatDistanceToNow(date, { addSuffix: true })
+
+  const createdAt = new Date(review.createdAt); // date from your DB
+  const now = new Date();
+
+  const diffInMs = now.getTime() - createdAt.getTime();
+
+  const diffInSec = Math.floor(diffInMs / 1000);
+  const diffInMin = Math.floor(diffInMs / (1000 * 60));
+  const diffInHr = Math.floor(diffInMs / (1000 * 60 * 60));
+  const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+  // Logic
+  let timeAgo = "";
+
+  if (diffInDays > 0) {
+    timeAgo = `${diffInDays} days ago`;
+  } else if (diffInHr > 0) {
+    timeAgo = `${diffInHr} hours ago`;
+  } else if (diffInMin > 0) {
+    timeAgo = `${diffInMin} minutes ago`;
+  } else {
+    timeAgo = `${diffInSec} seconds ago`;
+  }
 
   return (
     <div className="border-b border-gray-200 py-4">
@@ -18,7 +39,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
         <div className="relative h-10 w-10 overflow-hidden rounded-full">
           <Image
             src={review.userAvatar || "/placeholder.svg?height=40&width=40"}
-            alt={review.userName}
+            alt={review.user.name}
             fill
             className="object-cover"
           />
@@ -26,7 +47,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
         <div className="flex-1">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{review.userName}</p>
+              <p className="font-medium">{review.user.name}</p>
               <div className="mt-1 flex items-center gap-2">
                 <StarRating rating={review.rating} />
                 <span className="text-xs text-gray-500">{timeAgo}</span>

@@ -19,15 +19,20 @@ export interface Product {
 }
 
 export interface Review {
-  id: string
+  _id: string
   productId: string
   userId: string
-  userName: string
+  // userName: string
+  user: {
+    _id: string
+    name: string
+  }
   userAvatar?: string
   rating: number
   comment: string
   date: string
   verified?: boolean
+  createdAt: Date
 }
 
 export interface Customer {

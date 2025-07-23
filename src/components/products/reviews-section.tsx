@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import type { Review } from "@/lib/types"
 import { getReviewsByProductId } from "@/lib/reviews"
 import ReviewCard from "./review-card"
@@ -25,7 +25,13 @@ export default function ReviewsSection({ productId, initialReviews }: ReviewsSec
     setShowForm(false)
   }
 
+  console.log("ReviewsSection rendered with productId:", productId, "and initialReviews:", initialReviews)
+
   const userHasReviewed = user && reviews.some((review) => review.userId === user.id)
+
+  useEffect(() => {
+    setReviews(initialReviews);
+  }, [initialReviews]);
 
   return (
     <div className="mt-12 border-t pt-8">
@@ -59,7 +65,7 @@ export default function ReviewsSection({ productId, initialReviews }: ReviewsSec
       {reviews.length > 0 ? (
         <div className="space-y-4">
           {reviews.map((review) => (
-            <ReviewCard key={review.id} review={review} />
+            <ReviewCard key={review._id} review={review} />
           ))}
         </div>
       ) : (
