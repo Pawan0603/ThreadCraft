@@ -14,7 +14,7 @@ export default function CartItemCard({ item }: CartItemCardProps) {
 
   const handleQuantityChange = (newQuantity: number) => {
     if (newQuantity >= 1) {
-      updateQuantity(item.id, item.size, newQuantity)
+      updateQuantity(item._id, item.size, newQuantity)
     }
   }
 
@@ -63,7 +63,7 @@ export default function CartItemCard({ item }: CartItemCardProps) {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => removeFromCart(item.id, item.size)}
+            onClick={() => removeFromCart(item._id, item.size)}
             className="h-7 px-2 text-red-500 hover:bg-red-50 hover:text-red-600"
           >
             <Trash className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />

@@ -37,7 +37,7 @@ export default function CartPage() {
         <div className="md:col-span-2">
           <div className="flex flex-col gap-4">
             {cartItems.map((item) => (
-              <CartItemCard key={`${item.id}-${item.size}`} item={item} />
+              <CartItemCard key={`${item._id}-${item.size}`} item={item} />
             ))}
           </div>
         </div>
