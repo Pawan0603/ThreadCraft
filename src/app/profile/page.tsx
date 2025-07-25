@@ -20,6 +20,8 @@ import StarRating from "@/components/products/star-rating"
 import OrderStatusBadge from "@/components/orders/order-status-badge"
 import Link from "next/link"
 import { User, MapPin, Bell, Shield, Trash2, Eye, EyeOff, CheckCircle, Edit } from "lucide-react"
+import axios from "axios"
+import { access } from "fs"
 
 export default function ProfilePage() {
   const { user, logout } = useAuth()
@@ -87,13 +89,50 @@ export default function ProfilePage() {
 
   const [saveStatus, setSaveStatus] = useState<string | null>(null)
 
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    if(typeof window !== "undefined"){
+      const token = localStorage.getItem("accessToken");
+      setAccessToken(token);
+    } else {
+      setAccessToken(null);
+    }
+  }, []);
+
+  const fetchUserOrders = async () => {
+    if (!user) return;
+
+    try {
+      let res = await axios.get("/api/orders", {
+        params: {
+          userId: user._id,
+          page: 1,
+          limit: 10,
+        },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      if(res.status === 200){
+        setOrders(res.data.orders)
+      } else {
+        console.log("orders data fetching error", res)
+      }
+    } catch (error) {
+      console.log("Order data fetching error", error);
+    }
+  }
+
   useEffect(() => {
     if (user) {
       const userReviews = getReviewsByUserId(user.id)
       setReviews(userReviews)
 
-      const userOrders = getOrdersByUserId(user.id)
-      setOrders(userOrders)
+      // const userOrders = getOrdersByUserId(user.id)
+      // setOrders(userOrders)
+      fetchUserOrders();
 
       setPersonalInfo({
         name: user.name,
@@ -222,11 +261,11 @@ export default function ProfilePage() {
               {orders.length > 0 ? (
                 <div className="divide-y">
                   {orders.map((order) => (
-                    <div key={order.id} className="p-4">
+                    <div key={order._id} className="p-4">
                       <div className="flex flex-wrap items-start justify-between gap-4">
                         <div>
                           <div className="flex items-center gap-3">
-                            <h3 className="font-medium">Order #{order.id}</h3>
+                            <h3 className="font-medium">Order #{order.orderNumber}</h3>
                             <OrderStatusBadge status={order.status} />
                           </div>
                           <p className="mt-1 text-sm text-gray-500">
@@ -238,12 +277,12 @@ export default function ProfilePage() {
                           </p>
                         </div>
                         <div className="flex gap-2">
-                          <Link href={`/track-order?orderId=${order.id}&email=${user?.email}`}>
+                          <Link href={`/track-order?orderId=${order.orderNumber}&email=${user?.email}`}>
                             <Button variant="outline" size="sm">
                               Track Order
                             </Button>
                           </Link>
-                          <Link href={`/orders/${order.id}`}>
+                          <Link href={`/orders/${order.orderNumber}`}>
                             <Button size="sm">View Details</Button>
                           </Link>
                         </div>

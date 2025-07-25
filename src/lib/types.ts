@@ -64,7 +64,7 @@ export interface TrackingEvent {
 }
 
 export interface Order {
-  id: string
+  _id: string
   userId?: string
   customer: {
     name: string
@@ -85,6 +85,7 @@ export interface Order {
   estimatedDelivery?: string
   trackingNumber?: string
   trackingEvents?: TrackingEvent[]
+  orderNumber: string
 }
 
 export interface User {

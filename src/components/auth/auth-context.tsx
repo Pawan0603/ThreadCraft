@@ -4,12 +4,13 @@ import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 
 interface User {
-  id: string
+  _id: string
   name: string
   email: string
   avatar?: string
   role: string
   isEmailVerified: boolean
+  createdAt: Date
 }
 
 interface TokenPair {

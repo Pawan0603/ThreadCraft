@@ -47,7 +47,7 @@ async function getOrders(req: AuthenticatedRequest) {
         total,
         pages: Math.ceil(total / limit),
       },
-    })
+    }, { status: 200 })
   } catch (error) {
     console.error("Get orders error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
