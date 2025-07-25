@@ -58,46 +58,70 @@ async function getOrders(req: AuthenticatedRequest) {
 async function createOrder(req: AuthenticatedRequest) {
   try {
     await connectDB()
-
     const orderData = await req.json()
-    const { items, shippingAddress, paymentMethod } = orderData
+    const {
+      items,
+      customer,
+      shippingAddress,
+      billingAddress,
+      shipping,
+      paymentMethod,
+      paymentDetails,
+      notes,
+      couponCode,
+      discount = 0,
+      currency = "USD",
+    } = orderData
 
     if (!items || !items.length) {
       return NextResponse.json({ error: "Order items are required" }, { status: 400 })
     }
-
-    if (!shippingAddress) {
+    if (!customer || !customer.name || !customer.email || !customer.phone) {
+      return NextResponse.json({ error: "Customer info is required" }, { status: 400 })
+    }
+    if (!shippingAddress || !shippingAddress.name || !shippingAddress.street || !shippingAddress.city || !shippingAddress.state || !shippingAddress.zipCode || !shippingAddress.country) {
       return NextResponse.json({ error: "Shipping address is required" }, { status: 400 })
     }
+    if (!shipping || !shipping.method || typeof shipping.cost !== "number") {
+      return NextResponse.json({ error: "Shipping method/cost required" }, { status: 400 })
+    }
+    if (!paymentMethod) {
+      return NextResponse.json({ error: "Payment method is required" }, { status: 400 })
+    }
 
-    // Validate products and calculate total
+    // Validate products and calculate totals
     let subtotal = 0
-    const orderItems = []
+    const orderItems: any[] = []
 
     for (const item of items) {
       const product = await Product.findById(item.product)
       if (!product) {
-        return NextResponse.json({ error: `Product ${item.product} not found` }, { status: 404 })
+      return NextResponse.json({ error: `Product ${item.product} not found` }, { status: 404 })
       }
-
-      // Check stock
-      const variant = product.variants.find((v: any) => v.size === item.size && v.color === item.color)
+      // Find variant by size (and color if provided)
+      let variant
+      if (item.color) {
+      variant = product.variants.find((v: any) => v.size === item.size && v.color === item.color)
+      } else {
+      variant = product.variants.find((v: any) => v.size === item.size)
+      }
       if (!variant || variant.stock < item.quantity) {
-        return NextResponse.json({ error: `Insufficient stock for ${product.name}` }, { status: 400 })
+      return NextResponse.json({ error: `Insufficient stock for ${product.name}` }, { status: 400 })
       }
-
       const itemTotal = product.price * item.quantity
       subtotal += itemTotal
 
       orderItems.push({
-        product: product._id,
-        name: product.name,
-        price: product.price,
-        quantity: item.quantity,
-        size: item.size,
-        color: item.color,
-        image: product.images[0],
-        total: itemTotal,
+      product: product._id,
+      name: product.name,
+      slug: product.slug,
+      image: product.images[0],
+      price: product.price,
+      quantity: item.quantity,
+      size: item.size,
+      color: item.color,
+      sku: variant?.sku,
+      total: itemTotal,
       })
 
       // Update stock
@@ -106,25 +130,37 @@ async function createOrder(req: AuthenticatedRequest) {
     }
 
     // Calculate totals
-    const shipping = subtotal > 50 ? 0 : 5.99
     const tax = subtotal * 0.08
-    const total = subtotal + shipping + tax
+    const total = subtotal + shipping.cost + tax - discount
 
     // Generate order number
     const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`
 
     const order = new Order({
       orderNumber,
-      user: req.user!.userId,
+      user: req.user?.userId,
+      customer,
       items: orderItems,
       subtotal,
-      shipping,
       tax,
+      Shipping: shipping.cost,
+      discount,
       total,
-      shippingAddress,
-      paymentMethod: paymentMethod || "Cash on Delivery",
+      currency,
       status: "pending",
-      estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+      paymentStatus: "pending",
+      paymentMethod,
+      paymentDetails,
+      shippingAddress,
+      billingAddress,
+      shipping: {
+      ...shipping,
+      estimatedDelivery: shipping.estimatedDelivery || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+      trackingEvents: [],
+      notes,
+      couponCode,
+      refunds: [],
     })
 
     await order.save()

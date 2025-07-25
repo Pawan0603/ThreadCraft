@@ -2,34 +2,139 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useCart } from "@/components/cart/cart-context"
+import axios from "axios"
+import { useAuth } from "@/components/auth/auth-context"
 
 export default function CheckoutPage() {
   const router = useRouter()
   const { cartItems, clearCart } = useCart()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const { user } = useAuth();
 
   const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
 
-  if (cartItems.length === 0) {
-    router.push("/cart")
-    return null
-  }
+  const [shippingAddress, setShippingAddress] = useState({
+    fullName: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+
+  // 1) Read token once
+  useEffect(() => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null
+    if (token) setAccessToken(token)
+  }, [])
+
+  // 2) Redirect in an effect (NOT during render)
+  useEffect(() => {
+    if (cartItems.length === 0) {
+      router.replace("/cart")
+    }
+  }, [])
+
+  // 3) After hooks, you can early return
+  if (cartItems.length === 0) return null
+
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setShippingAddress({
+      ...shippingAddress,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
 
-    // Simulate API call
-    setTimeout(() => {
-      clearCart()
-      router.push("/order-success")
-    }, 1000)
+    try {
+      // Prepare customer info (assuming shippingAddress fields)
+      const customer = {
+        name: shippingAddress.fullName,
+        email: user?.email || "",
+        phone: shippingAddress.phone,
+      };
+
+      // Prepare shipping address for API
+      const shippingAddressApi = {
+        name: shippingAddress.fullName,
+        street: shippingAddress.address,
+        city: shippingAddress.city,
+        state: shippingAddress.state,
+        zipCode: shippingAddress.zipCode,
+        country: "US", // You may want to collect/select country in your form
+        phone: shippingAddress.phone,
+      };
+
+      // Prepare shipping info (static for now)
+      const shipping = {
+        method: "Standard Shipping",
+        cost: 0,
+        estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      };
+
+      const items = cartItems.map(item => ({
+        product: item._id,
+        name: item.name,
+        slug: item.slug,
+        image: item.images?.[0] || "",
+        price: item.price,
+        quantity: item.quantity,
+        size: item.size,
+        // color: item.color,
+        // sku: item.sku,
+        total: item.price * item.quantity,
+      }));
+
+      const paymentMethod = "cash_on_delivery";
+
+      const res = await axios.post(
+        "/api/orders",
+        {
+          items,
+          customer,
+          shippingAddress: shippingAddressApi,
+          billingAddress: shippingAddressApi,
+          shipping,
+          paymentMethod,
+          paymentDetails: {},
+          notes: "",
+          couponCode: "",
+          discount: 0,
+          currency: "USD",
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      // console.log("Order response:", res.data, "status:", res.status);
+
+      if (res.status === 201) {
+        // console.log("Order created successfully:", res.data);
+        clearCart();
+        router.push(`/orders/${res.data.order.orderNumber}`);
+      } else {
+        console.error("Order creation failed:", res.data);
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      console.error("Error processing order:", error);
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -45,34 +150,34 @@ export default function CheckoutPage() {
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="fullName">Full Name</Label>
-                  <Input id="fullName" placeholder="John Doe" required />
+                  <Input id="fullName" name="fullName" placeholder="John Doe" onChange={handleAddressChange} required />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="phone">Phone Number</Label>
-                  <Input id="phone" placeholder="(123) 456-7890" required />
+                  <Input id="phone" name="phone" placeholder="(123) 456-7890" onChange={handleAddressChange} required />
                 </div>
               </div>
 
               <div className="mt-4 space-y-2">
                 <Label htmlFor="address">Street Address</Label>
-                <Input id="address" placeholder="123 Main St" required />
+                <Input id="address" name="address" placeholder="123 Main St" onChange={handleAddressChange} required />
               </div>
 
               <div className="mt-4 grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
                   <Label htmlFor="city">City</Label>
-                  <Input id="city" placeholder="New York" required />
+                  <Input id="city" name="city" placeholder="New York" onChange={handleAddressChange} required />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="state">State</Label>
-                  <Input id="state" placeholder="NY" required />
+                  <Input id="state" name="state" placeholder="NY" onChange={handleAddressChange} required />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="zipCode">Pin Code</Label>
-                  <Input id="zipCode" placeholder="10001" required />
+                  <Input id="zipCode" name="zipCode" placeholder="10001" onChange={handleAddressChange} required />
                 </div>
               </div>
             </div>
@@ -89,7 +194,7 @@ export default function CheckoutPage() {
 
             <div className="space-y-3">
               {cartItems.map((item) => (
-                <div key={`${item.id}-${item.size}`} className="flex justify-between">
+                <div key={`${item._id}-${item.size}`} className="flex justify-between">
                   <span>
                     {item.name} ({item.size}) x {item.quantity}
                   </span>
