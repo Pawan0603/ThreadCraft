@@ -86,6 +86,12 @@ export interface Order {
   trackingNumber?: string
   trackingEvents?: TrackingEvent[]
   orderNumber: string
+  shippingAddress: {
+    street: string
+    city: string
+    state: string
+    zipCode: string
+  }
 }
 
 export interface User {

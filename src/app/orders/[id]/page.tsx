@@ -54,29 +54,6 @@ export default function OrderDetailPage() {
   }
 
   useEffect(() => {
-    // const fetchOrder = async () => {
-    //   setIsLoading(true)
-    //   // Simulate API delay
-    //   await new Promise((resolve) => setTimeout(resolve, 500))
-
-    //   const foundOrder = getOrderById(params.id)
-
-    //   if (foundOrder) {
-    //     // Check if the order belongs to the logged-in user
-    //     if (foundOrder.userId && user && foundOrder.userId !== user.id) {
-    //       router.push("/profile")
-    //       return
-    //     }
-    //     setOrder(foundOrder)
-    //   } else {
-    //     router.push("/profile")
-    //   }
-
-    //   setIsLoading(false)
-    // }
-
-    // fetchOrder()
-
     if (!accessToken) {
       console.log("Access token is required to fetch order details.")
       return
