@@ -2,6 +2,7 @@ import type { Order } from "@/lib/types"
 import Image from "next/image"
 import OrderStatusBadge from "./order-status-badge"
 import { format, parseISO } from "date-fns"
+import { CldImage } from "next-cloudinary"
 
 interface OrderSummaryProps {
   order: Order
@@ -12,7 +13,7 @@ export default function OrderSummary({ order }: OrderSummaryProps) {
     <div className="space-y-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-bold">Order #{order.id}</h2>
+          <h2 className="text-xl font-bold">Order #{order.orderNumber}</h2>
           <p className="text-sm text-muted-foreground">Placed on {format(parseISO(order.createdAt), "MMMM d, yyyy")}</p>
         </div>
         <OrderStatusBadge status={order.status} />
@@ -26,12 +27,18 @@ export default function OrderSummary({ order }: OrderSummaryProps) {
           {order.items.map((item) => (
             <div key={`${item.productId}-${item.size}`} className="flex items-center gap-4 p-4">
               <div className="relative h-16 w-16 overflow-hidden rounded bg-slate-100">
-                <Image
+                {!item.image ? (<Image
                   src={item.image || "/placeholder.svg?height=64&width=64"}
                   alt={item.name}
                   fill
                   className="object-cover"
-                />
+                />) : (<CldImage
+                  width="600"
+                  height="600"
+                  src={item.image!}
+                  sizes="100vw"
+                  alt={item.name}
+                />)}
               </div>
               <div className="flex-1">
                 <h4 className="font-medium">{item.name}</h4>
@@ -55,9 +62,9 @@ export default function OrderSummary({ order }: OrderSummaryProps) {
           </div>
           <div className="p-4">
             <p className="font-medium">{order.customer.name}</p>
-            <p>{order.customer.address.street}</p>
+            <p>{order.shippingAddress.street}</p>
             <p>
-              {order.customer.address.city}, {order.customer.address.state} {order.customer.address.zipCode}
+              {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}
             </p>
             <p className="mt-2">{order.customer.phone}</p>
           </div>

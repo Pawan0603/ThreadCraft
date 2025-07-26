@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/components/auth/auth-context"
 import { getOrderById } from "@/lib/orders"
@@ -9,37 +9,84 @@ import type { Order } from "@/lib/types"
 import OrderSummary from "@/components/orders/order-summary"
 import TrackingTimeline from "@/components/orders/tracking-timeline"
 import Link from "next/link"
+import axios from "axios"
 
-export default function OrderDetailPage({ params }: { params: { id: string } }) {
+export default function OrderDetailPage() {
   const { user } = useAuth()
   const router = useRouter()
   const [order, setOrder] = useState<Order | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
+  const params = useParams();
+  const paramsId = params?.id as string;
+
+  const [accessToken, setAccessToken] = useState<string | null>(null)
+
   useEffect(() => {
-    const fetchOrder = async () => {
-      setIsLoading(true)
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
-      const foundOrder = getOrderById(params.id)
-
-      if (foundOrder) {
-        // Check if the order belongs to the logged-in user
-        if (foundOrder.userId && user && foundOrder.userId !== user.id) {
-          router.push("/profile")
-          return
-        }
-        setOrder(foundOrder)
-      } else {
-        router.push("/profile")
-      }
-
-      setIsLoading(false)
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("accessToken")
+      setAccessToken(token)
     }
+  }, []);
 
-    fetchOrder()
-  }, [params.id, router, user])
+  const fetchOrder = async () => {
+    console.log("Fetching order with ID:", paramsId)
+    setIsLoading(true);
+    try {
+      console.log("Path", `/api/orders/${paramsId}`)
+      let res = await axios.get(`/api/orders/${paramsId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          }
+        })
+
+      if (res.status === 200) {
+        setOrder(res.data.order);
+        console.log(res)
+      }
+    } catch (error) {
+      console.log("Error fetching order:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    // const fetchOrder = async () => {
+    //   setIsLoading(true)
+    //   // Simulate API delay
+    //   await new Promise((resolve) => setTimeout(resolve, 500))
+
+    //   const foundOrder = getOrderById(params.id)
+
+    //   if (foundOrder) {
+    //     // Check if the order belongs to the logged-in user
+    //     if (foundOrder.userId && user && foundOrder.userId !== user.id) {
+    //       router.push("/profile")
+    //       return
+    //     }
+    //     setOrder(foundOrder)
+    //   } else {
+    //     router.push("/profile")
+    //   }
+
+    //   setIsLoading(false)
+    // }
+
+    // fetchOrder()
+
+    if (!accessToken) {
+      console.log("Access token is required to fetch order details.")
+      return
+    }
+    if (!paramsId) {
+      console.log("Order ID is required to fetch order details.")
+      return
+    }
+    fetchOrder();
+  }, [paramsId, accessToken])
 
   if (isLoading) {
     return (
@@ -70,7 +117,7 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
     <div className="container mx-auto px-4 py-8 md:py-12">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold md:text-3xl">Order Details</h1>
-        <Link href={`/track-order?orderId=${order.id}&email=${order.customer.email}`}>
+        <Link href={`/track-order?orderId=${order._id}&email=${order.customer.email}`}>
           <Button variant="outline">Track Order</Button>
         </Link>
       </div>
