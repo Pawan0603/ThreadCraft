@@ -142,7 +142,7 @@ export default function ProfilePage() {
         gender: "",
       })
     }
-  }, [user])
+  }, [user, accessToken])
 
   const handleLogout = () => {
     logout()
