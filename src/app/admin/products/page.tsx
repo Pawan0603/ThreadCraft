@@ -14,6 +14,7 @@ import { Plus, Search, Edit, Trash2, Eye, ArrowUpDown, CheckCircle } from "lucid
 import { getAllProducts } from "@/lib/products"
 import type { Product } from "@/lib/types"
 import axios from "axios"
+import { CldImage } from "next-cloudinary"
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -277,12 +278,20 @@ export default function AdminProductsPage() {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="relative h-12 w-12 overflow-hidden rounded bg-gray-100">
-                          <Image
-                            src={product.image || "/placeholder.svg?height=48&width=48"}
+                          {!product.images ? (<Image
+                            src={"/placeholder.svg?height=48&width=48"}
                             alt={product.name}
                             fill
                             className="object-cover"
-                          />
+                          />) : (
+                            <CldImage
+                              width="960"
+                              height="600"
+                              src={product.images[0]}
+                              sizes="100vw"
+                              alt={product.name}
+                            />
+                          )}
                         </div>
                         <div>
                           <p className="font-medium">{product.name}</p>
@@ -307,7 +316,7 @@ export default function AdminProductsPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Link href={`/products/${product.slug}`}>
+                        <Link href={`/products/${product._id}`}>
                           <Button variant="outline" size="sm">
                             <Eye className="h-4 w-4" />
                           </Button>

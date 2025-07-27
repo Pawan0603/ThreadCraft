@@ -360,7 +360,7 @@ export default function AdminDashboard() {
                 <div className="space-y-4">
                   {products.slice(0, 5).map((product) => (
                     <div
-                      key={product.id}
+                      key={product._id}
                       className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                     >
                       <div className="flex items-center gap-4">
@@ -368,7 +368,7 @@ export default function AdminDashboard() {
                         <div>
                           <h3 className="font-medium">{product.name}</h3>
                           <p className="text-sm text-gray-500">
-                            {product.category} • ${product.price.toFixed(2)}
+                            {product.category.name} • ${product.price.toFixed(2)}
                           </p>
                         </div>
                       </div>
