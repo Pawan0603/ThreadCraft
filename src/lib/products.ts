@@ -1,3 +1,4 @@
+import axios from "axios";
 import type { Product } from "./types"
 
 const products: Product[] = [
@@ -106,8 +107,16 @@ const products: Product[] = [
   },
 ]
 
-export function getAllProducts(): Product[] {
-  return products
+export async function getAllProducts(): Promise<Product[]> {
+  // return products
+  try {
+    let res = await axios.get("/api/products")
+    console.log("Fetched products:", res.data);
+    return res.data.products as Product[];
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    return [];
+  }
 }
 
 export function getFeaturedProducts(): Product[] {

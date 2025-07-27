@@ -50,7 +50,7 @@ export default function AdminDashboard() {
     // Simulate API loading
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    const allProducts = getAllProducts()
+    const allProducts = await getAllProducts()
     const allOrders = getAllOrders()
     const allUsers = getAllUsers()
 
@@ -285,12 +285,12 @@ export default function AdminDashboard() {
                   <div className="space-y-4">
                     {recentProducts.map((product) => (
                       <div
-                        key={product.id}
+                        key={product._id}
                         className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors"
                       >
                         <div>
                           <p className="font-medium">{product.name}</p>
-                          <p className="text-sm text-gray-500">{product.category}</p>
+                          <p className="text-sm text-gray-500">{product.category.name}</p>
                         </div>
                         <div className="text-right">
                           <p className="font-medium">${product.price.toFixed(2)}</p>
