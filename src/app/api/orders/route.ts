@@ -19,7 +19,7 @@ async function getOrders(req: AuthenticatedRequest) {
     const query: any = {}
 
     if (!isAdmin) {
-      query.user = req.user!.userId
+      query.user = req.user!.userId // Only get user's own orders
     }
 
     if (status) {
@@ -27,7 +27,7 @@ async function getOrders(req: AuthenticatedRequest) {
     }
 
     const skip = (page - 1) * limit
-
+    
     const [orders, total] = await Promise.all([
       Order.find(query)
         .populate("user", "name email")
