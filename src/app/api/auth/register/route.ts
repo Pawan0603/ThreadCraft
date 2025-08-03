@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import connectDB from "@/lib/database/connection"
 import User from "@/lib/models/User"
 import { hashPassword, generateTokens, generateRandomToken } from "@/lib/auth/jwt"
+import { cookies } from "next/headers"
 
 export async function POST(req: NextRequest) {
   try {
@@ -54,6 +55,21 @@ export async function POST(req: NextRequest) {
       role: user.role,
       isEmailVerified: user.isEmailVerified,
     }
+
+    // Set cookies for tokens
+    const cookieStore = await cookies()
+    cookieStore.set("accessToken", tokens.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: '/',
+    })
+    cookieStore.set("refreshToken", tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: '/',
+    })
 
     return NextResponse.json(
       {

@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import connectDB from "@/lib/database/connection"
 import User from "@/lib/models/User"
 import { verifyToken, generateTokens } from "@/lib/auth/jwt"
+import { cookies } from "next/headers"
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,6 +32,11 @@ export async function POST(req: NextRequest) {
       email: user.email,
       role: user.role,
     })
+
+    // Set new tokens in cookies
+    const cookieStore = await cookies()
+    cookieStore.set("accessToken", tokens.accessToken, { httpOnly: true, secure: true, sameSite: "strict" })
+    cookieStore.set("refreshToken", tokens.refreshToken, { httpOnly: true, secure: true, sameSite: "strict" })
 
     return NextResponse.json({
       tokens,
