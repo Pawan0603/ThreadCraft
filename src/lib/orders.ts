@@ -1,3 +1,4 @@
+import axios from "axios"
 import type { Order } from "./types"
 import { addDays, format, subDays } from "date-fns"
 
@@ -252,9 +253,23 @@ export function getOrdersByUserId(userId: string): Order[] {
 }
 
 export function getOrderByIdAndEmail(orderId: string, email: string): Order | undefined {
-  return ordersWithTracking.find((order) => order.id === orderId && order.customer.email === email)
+  return ordersWithTracking.find((order) => order._id === orderId && order.customer.email === email)
 }
 
-export function getAllOrders(): Order[] {
-  return ordersWithTracking
+export async function getAllOrders(accessToken: string): Promise<Order[]> {
+  // return ordersWithTracking
+  try {
+    console.log("from orders asscesstod g: ", accessToken)
+    let res = await axios.get("/api/orders", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+    console.log("Fetched all orders:", res.data)
+    return res.data.orders
+  } catch (error) {
+    console.error("Error fetching all orders:", error)
+    return []
+  }
 }

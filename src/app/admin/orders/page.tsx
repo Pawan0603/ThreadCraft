@@ -11,6 +11,7 @@ import { Search, Download, Eye, Edit, Truck, Package, CheckCircle, Clock, AlertC
 import { getAllOrders } from "@/lib/orders"
 import type { Order } from "@/lib/types"
 import Link from "next/link"
+import axios from "axios"
 
 type OrderStatus = "Pending" | "Processing" | "Shipped" | "Out for Delivery" | "Delivered" | "Cancelled"
 
@@ -22,11 +23,26 @@ export default function AdminOrdersPage() {
   const [dateFilter, setDateFilter] = useState("all")
   const [notification, setNotification] = useState<string | null>(null)
 
+  const [accessToken, setAccessToken] = useState<string | null>(null)
+
   useEffect(() => {
-    const allOrders = getAllOrders()
-    setOrders(allOrders)
-    setFilteredOrders(allOrders)
-  }, [])
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("accessToken");
+      setAccessToken(token);
+    } else {
+      setAccessToken(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      if (accessToken === null) return;
+      const allOrders = await getAllOrders(accessToken)
+      setOrders(allOrders)
+      setFilteredOrders(allOrders)
+    }
+    fetchOrders();
+  }, [accessToken])
 
   useEffect(() => {
     let filtered = orders
@@ -35,7 +51,7 @@ export default function AdminOrdersPage() {
     if (searchQuery) {
       filtered = filtered.filter(
         (order) =>
-          order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          order._id.toLowerCase().includes(searchQuery.toLowerCase()) ||
           order.customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           order.customer.email.toLowerCase().includes(searchQuery.toLowerCase()),
       )
@@ -69,12 +85,29 @@ export default function AdminOrdersPage() {
     setFilteredOrders(filtered)
   }, [orders, searchQuery, statusFilter, dateFilter])
 
-  const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
-    setOrders((prevOrders) =>
-      prevOrders.map((order) => (order.id === orderId ? { ...order, status: newStatus } : order)),
-    )
-    setNotification(`Order ${orderId} status updated to ${newStatus}`)
-    setTimeout(() => setNotification(null), 3000)
+  const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
+    try {
+      let res = await axios.put(`/api/orders/${orderId}`, { status: newStatus }, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      // console.log("Order status updated:", res.data)
+
+      // update Orders on client side...
+      setOrders((prevOrders) =>
+        prevOrders.map((order) => (order._id === orderId ? { ...order, status: newStatus } : order)),
+      )
+      setNotification(`Order ${orderId} status updated to ${newStatus}`)
+    } catch (error) {
+      console.error("Error updating order status:", error)
+      setNotification("Failed to update order status")
+      return
+    } finally {
+      setTimeout(() => setNotification(null), 3000)
+    }
+
   }
 
   const getStatusIcon = (status: OrderStatus) => {
@@ -252,8 +285,8 @@ export default function AdminOrdersPage() {
               </TableHeader>
               <TableBody>
                 {filteredOrders.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell className="font-medium">{order.id}</TableCell>
+                  <TableRow key={order._id}>
+                    <TableCell className="font-medium">{order._id}</TableCell>
                     <TableCell>
                       <div>
                         <p className="font-medium">{order.customer.name}</p>
@@ -266,7 +299,7 @@ export default function AdminOrdersPage() {
                     <TableCell>
                       <Select
                         value={order.status}
-                        onValueChange={(value) => handleStatusChange(order.id, value as OrderStatus)}
+                        onValueChange={(value) => handleStatusChange(order._id, value as OrderStatus)}
                       >
                         <SelectTrigger className="w-40">
                           <div className="flex items-center gap-2">
@@ -286,12 +319,12 @@ export default function AdminOrdersPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Link href={`/orders/${order.id}`}>
+                        <Link href={`/orders/${order.orderNumber}`}>
                           <Button variant="outline" size="sm">
                             <Eye className="h-4 w-4" />
                           </Button>
                         </Link>
-                        <Button variant="outline" size="sm">
+                        <Button disabled variant="outline" size="sm">
                           <Edit className="h-4 w-4" />
                         </Button>
                       </div>

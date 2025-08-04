@@ -29,11 +29,11 @@ export function withAuth(handler: (req: AuthenticatedRequest, context: any) => P
   }
 }
 
-export function withAdminAuth(handler: (req: AuthenticatedRequest) => Promise<NextResponse>) {
-  return withAuth(async (req: AuthenticatedRequest): Promise<NextResponse> => {
+export function withAdminAuth(handler: (req: AuthenticatedRequest, context: any) => Promise<NextResponse>) {
+  return withAuth(async (req: AuthenticatedRequest, context: any): Promise<NextResponse> => {
     if (!req.user || !["admin", "super_admin"].includes(req.user.role)) {
       return NextResponse.json({ error: "Admin access required" }, { status: 403 })
     }
-    return handler(req)
+    return handler(req, context)
   })
 }

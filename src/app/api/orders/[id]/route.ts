@@ -40,10 +40,12 @@ async function getOrder(req: AuthenticatedRequest, context: { params: { id: stri
 }
 
 // PUT /api/orders/[id] - Update order status (Admin only)
-async function updateOrder(req: AuthenticatedRequest, { params }: { params: { id: string } }) {
+async function updateOrder(req: AuthenticatedRequest, context: { params: { id: string } }) {
   try {
     await connectDB()
-
+    if (!req.user || !["admin", "super_admin"].includes(req.user.role)) {
+      return NextResponse.json({ error: "Admin access required" }, { status: 403 })
+    }
     const { status, trackingNumber, notes } = await req.json()
 
     const updateData: any = { updatedAt: new Date() }
@@ -63,7 +65,7 @@ async function updateOrder(req: AuthenticatedRequest, { params }: { params: { id
       updateData.trackingNumber = trackingNumber
     }
 
-    const order = await Order.findByIdAndUpdate(params.id, updateData, { new: true })
+    const order = await Order.findByIdAndUpdate(context.params.id, updateData, { new: true })
       .populate("user", "name email")
       .populate("items.product", "name image")
 
