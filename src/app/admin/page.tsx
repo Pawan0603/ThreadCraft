@@ -45,14 +45,16 @@ export default function AdminDashboard() {
     customerGrowth: 15,
   })
 
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+
   const loadData = async () => {
     setIsLoading(true)
     // Simulate API loading
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
     const allProducts = await getAllProducts()
-    const allOrders = getAllOrders()
-    const allUsers = getAllUsers()
+    const allOrders = await getAllOrders(accessToken)
+    const allUsers = await getAllUsers(accessToken)
 
     setProducts(allProducts)
     setOrders(allOrders)
@@ -78,8 +80,17 @@ export default function AdminDashboard() {
   }
 
   useEffect(() => {
-    loadData()
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("accessToken")
+      setAccessToken(token)
+    }
   }, [])
+
+  useEffect(() => {
+    if (accessToken) {
+      loadData()
+    }
+  }, [accessToken]);
 
   const handleRefresh = () => {
     loadData()
@@ -251,11 +262,11 @@ export default function AdminDashboard() {
                   <div className="space-y-4">
                     {recentOrders.map((order) => (
                       <div
-                        key={order.id}
+                        key={order._id}
                         className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors"
                       >
                         <div>
-                          <p className="font-medium">{order.id}</p>
+                          <p className="font-medium">{order.orderNumber}</p>
                           <p className="text-sm text-gray-500">{order.customer.name}</p>
                         </div>
                         <div className="text-right">
@@ -378,7 +389,7 @@ export default function AdminDashboard() {
                             <Eye className="h-4 w-4" />
                           </Button>
                         </Link>
-                        <Link href={`/admin/products/${product.id}/edit`}>
+                        <Link href={`/admin/products/${product._id}/edit`}>
                           <Button variant="outline" size="sm">
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -427,11 +438,11 @@ export default function AdminDashboard() {
                 <div className="space-y-4">
                   {orders.slice(0, 8).map((order) => (
                     <div
-                      key={order.id}
+                      key={order._id}
                       className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                     >
                       <div>
-                        <h3 className="font-medium">{order.id}</h3>
+                        <h3 className="font-medium">{order._id}</h3>
                         <p className="text-sm text-gray-500">
                           {order.customer.name} • {new Date(order.createdAt).toLocaleDateString()}
                         </p>
