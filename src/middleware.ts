@@ -9,8 +9,15 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
+  if (!accessToken && (request.nextUrl.pathname.startsWith('/profile'))) {
+    // If access token does not exist and user is trying to access profile, redirect to login
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  
+
 }
 
 export const config = {
-  matcher: ['/login', '/signup', '/forgot-password', '/reset-password', '/verify-email'],
+  matcher: ['/login', '/signup', '/forgot-password', '/reset-password', '/verify-email', '/profile'],
 }
