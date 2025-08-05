@@ -51,10 +51,23 @@ export default function AdminAnalyticsPage() {
     conversionRate: 3.2,
   })
 
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+
   useEffect(() => {
-    const allOrders = getAllOrders()
-    const allProducts = getAllProducts()
-    const allUsers = getAllUsers()
+    if (typeof window !== "undefined") {
+      let token = localStorage.getItem("accessToken");
+      setAccessToken(token);
+    }
+  }, []);
+
+  const fetchData = async () => {
+    if (!accessToken) {
+      alert("accessToken is requird!");
+      return;
+    }
+    const allOrders = await getAllOrders(accessToken)
+    const allProducts = await getAllProducts()
+    const allUsers = await getAllUsers(accessToken)
 
     setOrders(allOrders)
 
@@ -108,16 +121,16 @@ export default function AdminAnalyticsPage() {
     // Sales by category
     const categorySales = new Map<string, number>()
     allProducts.forEach((product) => {
-      const productOrders = currentOrders.filter((order) => order.items.some((item) => item.productId === product.id))
+      const productOrders = currentOrders.filter((order) => order.items.some((item) => item.productId === product._id))
       const sales = productOrders.reduce(
         (sum, order) =>
           sum +
           order.items
-            .filter((item) => item.productId === product.id)
+            .filter((item) => item.productId === product._id)
             .reduce((itemSum, item) => itemSum + item.quantity, 0),
         0,
       )
-      categorySales.set(product.category, (categorySales.get(product.category) || 0) + sales)
+      categorySales.set(product.category.name, (categorySales.get(product.category.name) || 0) + sales)
     })
 
     const totalSales = Array.from(categorySales.values()).reduce((sum, sales) => sum + sales, 0)
@@ -175,7 +188,12 @@ export default function AdminAnalyticsPage() {
       customerRetention: 68,
       conversionRate: 3.2,
     })
-  }, [timeRange])
+  };
+
+  useEffect(() => {
+    if(!accessToken) return;
+    fetchData();
+  }, [timeRange, accessToken]);
 
   const handleExportReport = () => {
     // Simulate export
