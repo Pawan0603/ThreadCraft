@@ -92,10 +92,15 @@ export interface Order {
     state: string
     zipCode: string
   }
+  user?:{
+    email: string
+    name: string
+    _id: string
+  }
 }
 
 export interface User {
-  id: string
+  _id: string
   name: string
   email: string
   avatar?: string

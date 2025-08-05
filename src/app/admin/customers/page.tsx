@@ -47,39 +47,57 @@ export default function AdminCustomersPage() {
     averageOrderValue: 0,
   })
 
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+
   useEffect(() => {
-    const users = getAllUsers()
-    const orders = getAllOrders()
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("accessToken");
+      setAccessToken(token);
+    }
+  }, []);
 
-    // Calculate customer stats
-    const customersWithStats: CustomerWithStats[] = users.map((user) => {
-      const userOrders = orders.filter((order) => order.userId === user.id)
-      const totalSpent = userOrders.reduce((sum, order) => sum + order.total, 0)
-      const lastOrder = userOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0]
-
-      return {
-        ...user,
-        totalOrders: userOrders.length,
-        totalSpent,
-        lastOrderDate: lastOrder?.createdAt,
-        status: userOrders.length > 0 ? "Active" : "Inactive",
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!accessToken) {
+        setNotification("Access token is missing. Please log in.");
+        return;
       }
-    })
+      const users = await getAllUsers(accessToken)
+      const orders = await getAllOrders(accessToken)
 
-    setCustomers(customersWithStats)
-    setFilteredCustomers(customersWithStats)
+      // Calculate customer stats
+      const customersWithStats: CustomerWithStats[] = users.map((user) => {
+        const userOrders = orders.filter((order) => order.user!._id === user._id)
+        const totalSpent = userOrders.reduce((sum, order) => sum + order.total, 0)
+        const lastOrder = userOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0]
 
-    // Calculate overall stats
-    const totalSpent = customersWithStats.reduce((sum, customer) => sum + customer.totalSpent, 0)
-    const totalOrders = customersWithStats.reduce((sum, customer) => sum + customer.totalOrders, 0)
+        return {
+          ...user,
+          totalOrders: userOrders.length,
+          totalSpent,
+          lastOrderDate: lastOrder?.createdAt,
+          status: userOrders.length > 0 ? "Active" : "Inactive",
+        }
+      })
 
-    setStats({
-      totalCustomers: customersWithStats.length,
-      activeCustomers: customersWithStats.filter((c) => c.status === "Active").length,
-      newThisMonth: Math.floor(customersWithStats.length * 0.15),
-      averageOrderValue: totalOrders > 0 ? totalSpent / totalOrders : 0,
-    })
-  }, [])
+      setCustomers(customersWithStats)
+      setFilteredCustomers(customersWithStats)
+
+      // Calculate overall stats
+      const totalSpent = customersWithStats.reduce((sum, customer) => sum + customer.totalSpent, 0)
+      const totalOrders = customersWithStats.reduce((sum, customer) => sum + customer.totalOrders, 0)
+
+      setStats({
+        totalCustomers: customersWithStats.length,
+        activeCustomers: customersWithStats.filter((c) => c.status === "Active").length,
+        newThisMonth: Math.floor(customersWithStats.length * 0.15),
+        averageOrderValue: totalOrders > 0 ? totalSpent / totalOrders : 0,
+      })
+    }
+    if (accessToken) {
+      fetchData()
+    }
+  }, [accessToken])
 
   useEffect(() => {
     let filtered = customers
@@ -117,7 +135,7 @@ export default function AdminCustomersPage() {
 
   const handleDeleteCustomer = (customerId: string) => {
     if (confirm("Are you sure you want to delete this customer? This action cannot be undone.")) {
-      setCustomers(customers.filter((customer) => customer.id !== customerId))
+      setCustomers(customers.filter((customer) => customer._id !== customerId))
       setNotification("Customer deleted successfully!")
       setTimeout(() => setNotification(null), 3000)
     }
@@ -126,12 +144,12 @@ export default function AdminCustomersPage() {
   const handleBlockCustomer = (customerId: string) => {
     setCustomers(
       customers.map((customer) =>
-        customer.id === customerId
+        customer._id === customerId
           ? { ...customer, status: customer.status === "Blocked" ? "Active" : ("Blocked" as const) }
           : customer,
       ),
     )
-    const customer = customers.find((c) => c.id === customerId)
+    const customer = customers.find((c) => c._id === customerId)
     const action = customer?.status === "Blocked" ? "unblocked" : "blocked"
     setNotification(`Customer ${action} successfully!`)
     setTimeout(() => setNotification(null), 3000)
@@ -297,7 +315,7 @@ export default function AdminCustomersPage() {
               </TableHeader>
               <TableBody>
                 {filteredCustomers.map((customer) => (
-                  <TableRow key={customer.id}>
+                  <TableRow key={customer._id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="relative h-10 w-10 overflow-hidden rounded-full">
@@ -334,7 +352,7 @@ export default function AdminCustomersPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleBlockCustomer(customer.id)}
+                          onClick={() => handleBlockCustomer(customer._id)}
                           title={customer.status === "Blocked" ? "Unblock Customer" : "Block Customer"}
                         >
                           <Edit className="h-4 w-4" />
@@ -342,7 +360,7 @@ export default function AdminCustomersPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleDeleteCustomer(customer.id)}
+                          onClick={() => handleDeleteCustomer(customer._id)}
                           title="Delete Customer"
                         >
                           <Trash2 className="h-4 w-4" />

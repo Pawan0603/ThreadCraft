@@ -1,16 +1,17 @@
+import axios from "axios"
 import type { User } from "./types"
 
 // Mock users database
 const users: User[] = [
   {
-    id: "user1",
+    _id: "user1",
     name: "John Doe",
     email: "john@example.com",
     avatar: "/placeholder.svg?height=40&width=40",
     createdAt: "2023-01-15T10:30:00Z",
   },
   {
-    id: "user2",
+    _id: "user2",
     name: "Jane Smith",
     email: "jane@example.com",
     avatar: "/placeholder.svg?height=40&width=40",
@@ -40,7 +41,7 @@ export function createUser(name: string, email: string, password: string): User 
 
   // Create new user
   const newUser: User = {
-    id: `user${users.length + 1}`,
+    _id: `user${users.length + 1}`,
     name,
     email,
     avatar: "/placeholder.svg?height=40&width=40",
@@ -54,6 +55,21 @@ export function createUser(name: string, email: string, password: string): User 
   return newUser
 }
 
-export function getAllUsers(): User[] {
-  return users
+export async function getAllUsers(accessToken: string): Promise<User[]> {
+  // return users
+  try {
+    let res = await axios.get<{ users: User[] }>("/api/users",
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    )
+    console.log("Fetched all users:", res.data)
+    return res.data.users
+  } catch (error) {
+    console.error("Error fetching users:", error)
+    return []
+  }
 }
