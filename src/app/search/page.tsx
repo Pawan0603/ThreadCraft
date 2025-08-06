@@ -12,16 +12,20 @@ export default function SearchPage() {
   const [results, setResults] = useState<Product[]>([])
 
   useEffect(() => {
-    if (query) {
-      const allProducts = getAllProducts()
-      const filteredProducts = allProducts.filter((product) => {
-        const searchableText = `${product.name} ${product.description} ${product.category}`.toLowerCase()
-        return searchableText.includes(query.toLowerCase())
-      })
-      setResults(filteredProducts)
-    } else {
-      setResults([])
+    const fetchProducts = async () => {
+      if (query) {
+        const allProducts = await getAllProducts()
+        const filteredProducts = allProducts.filter((product) => {
+          const searchableText = `${product.name} ${product.description} ${product.category}`.toLowerCase()
+          return searchableText.includes(query.toLowerCase())
+        })
+        setResults(filteredProducts)
+      } else {
+        setResults([])
+      }
     }
+
+    fetchProducts();
   }, [query])
 
   return (
