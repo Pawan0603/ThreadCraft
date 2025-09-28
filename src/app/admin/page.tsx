@@ -50,7 +50,12 @@ export default function AdminDashboard() {
   const loadData = async () => {
     setIsLoading(true)
     // Simulate API loading
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    // await new Promise((resolve) => setTimeout(resolve, 1000))
+    if(!accessToken) {
+      console.error("No access token found")
+      setIsLoading(false)
+      return
+    }
 
     const allProducts = await getAllProducts()
     const allOrders = await getAllOrders(accessToken)
@@ -58,7 +63,7 @@ export default function AdminDashboard() {
 
     setProducts(allProducts)
     setOrders(allOrders)
-    setUsers(allUsers)
+    // setUsers(allUsers)
 
     // Calculate stats
     const totalRevenue = allOrders.reduce((sum, order) => sum + order.total, 0)

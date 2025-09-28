@@ -13,10 +13,10 @@ interface User {
   createdAt: Date
 }
 
-interface TokenPair {
-  accessToken: string
-  refreshToken: string
-}
+// interface TokenPair {
+//   accessToken: string
+//   refreshToken: string
+// }
 
 interface AuthContextType {
   user: User | null

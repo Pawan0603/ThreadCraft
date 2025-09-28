@@ -125,6 +125,7 @@ export default function AdminCategoriesPage() {
         })
       }
     } catch (error) {
+      console.error("Error creating category:", error)
       toast({
         title: "Error",
         description: "Something went wrong",

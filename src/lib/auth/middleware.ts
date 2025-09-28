@@ -24,6 +24,7 @@ export function withAuth(handler: (req: AuthenticatedRequest, context: any) => P
       req.user = payload
       return handler(req, context)
     } catch (error) {
+      console.log("Authentication error:", error)
       return NextResponse.json({ error: "Authentication failed" }, { status: 401 })
     }
   }

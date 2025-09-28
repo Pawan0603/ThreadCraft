@@ -9,7 +9,7 @@ import Link from "next/link"
 
 export default function CartPage() {
   const router = useRouter()
-  const { cartItems, clearCart } = useCart()
+  const { cartItems } = useCart()
 
   const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
 
@@ -18,7 +18,7 @@ export default function CartPage() {
       <div className="container mx-auto flex flex-col items-center justify-center px-4 py-16 text-center">
         <ShoppingBag className="mb-4 h-16 w-16 text-slate-300" />
         <h1 className="mb-2 text-2xl font-bold">Your cart is empty</h1>
-        <p className="mb-8 text-slate-600">Looks like you haven't added any items to your cart yet.</p>
+        <p className="mb-8 text-slate-600">Looks like you haven&apos;t added any items to your cart yet.</p>
         <Link href="/products">
           <Button className="flex items-center gap-2">
             Continue Shopping

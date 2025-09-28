@@ -1,13 +1,13 @@
 import { cookies } from "next/headers"
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   // In a stateless JWT system, logout is handled client-side
   // by removing the tokens from storage
 
   const cookieStore = await cookies()
-  cookieStore.delete("accessToken", { path: "/" })
-  cookieStore.delete("refreshToken", { path: "/" })
+  cookieStore.delete("accessToken")
+  cookieStore.delete("refreshToken")
 
   return NextResponse.json({
     message: "Logout successful",

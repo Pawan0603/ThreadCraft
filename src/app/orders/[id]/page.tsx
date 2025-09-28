@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { useAuth } from "@/components/auth/auth-context"
-import { getOrderById } from "@/lib/orders"
+// import { useAuth } from "@/components/auth/auth-context"
+// import { getOrderById } from "@/lib/orders"
 import type { Order } from "@/lib/types"
 import OrderSummary from "@/components/orders/order-summary"
 import TrackingTimeline from "@/components/orders/tracking-timeline"
@@ -12,8 +12,8 @@ import Link from "next/link"
 import axios from "axios"
 
 export default function OrderDetailPage() {
-  const { user } = useAuth()
-  const router = useRouter()
+  // const { user } = useAuth()
+  // const router = useRouter()
   const [order, setOrder] = useState<Order | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -34,7 +34,7 @@ export default function OrderDetailPage() {
     setIsLoading(true);
     try {
       console.log("Path", `/api/orders/${paramsId}`)
-      let res = await axios.get(`/api/orders/${paramsId}`,
+      const res = await axios.get(`/api/orders/${paramsId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -81,7 +81,7 @@ export default function OrderDetailPage() {
       <div className="container mx-auto px-4 py-8 text-center">
         <h1 className="mb-4 text-2xl font-bold">Order Not Found</h1>
         <p className="mb-6 text-gray-600">
-          The order you're looking for doesn't exist or you don't have permission to view it.
+          The order you&apos;re looking for doesn&apos;t exist or you don&apos;t have permission to view it.
         </p>
         <Link href="/profile">
           <Button>Back to Profile</Button>

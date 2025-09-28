@@ -260,7 +260,7 @@ export async function getAllOrders(accessToken: string): Promise<Order[]> {
   // return ordersWithTracking
   try {
     console.log("from orders asscesstod g: ", accessToken)
-    let res = await axios.get("/api/orders", {
+    const res = await axios.get("/api/orders", {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,

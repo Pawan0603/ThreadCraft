@@ -1,7 +1,7 @@
 import type { Review } from "@/lib/types"
 import StarRating from "./star-rating"
 import Image from "next/image"
-import { formatDistanceToNow } from "date-fns"
+// import { formatDistanceToNow } from "date-fns"
 import { CheckCircle2 } from "lucide-react"
 
 interface ReviewCardProps {

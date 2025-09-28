@@ -58,7 +58,7 @@ export function createUser(name: string, email: string, password: string): User 
 export async function getAllUsers(accessToken: string): Promise<User[]> {
   // return users
   try {
-    let res = await axios.get<{ users: User[] }>("/api/users",
+    const res = await axios.get<{ users: User[] }>("/api/users",
       {
         headers: {
           "Content-Type": "application/json",

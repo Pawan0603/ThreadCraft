@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Plus, Search, Edit, Trash2, Eye, ArrowUpDown, CheckCircle } from "lucide-react"
-import { getAllProducts } from "@/lib/products"
+// import { getAllProducts } from "@/lib/products"
 import type { Product } from "@/lib/types"
 import axios from "axios"
 import { CldImage } from "next-cloudinary"

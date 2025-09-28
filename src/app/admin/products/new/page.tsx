@@ -134,9 +134,9 @@ export default function AddProductPage() {
     setFormData((prev) => ({ ...prev, images: newImages }))
   }
 
-  const addImageField = () => {
-    setFormData((prev) => ({ ...prev, images: [...prev.images, ""] }))
-  }
+  // const addImageField = () => {
+  //   setFormData((prev) => ({ ...prev, images: [...prev.images, ""] }))
+  // }
 
   const removeImageField = (index: number) => {
     if (formData.images.length > 1) {
@@ -179,7 +179,7 @@ export default function AddProductPage() {
     setFormData((prev) => ({ ...prev, variants: [...prev.variants, newVariant] }))
   }
 
-  const updateVariant = (index: number, field: keyof ProductVariant, value: any) => {
+  const updateVariant = (index: number, field: keyof ProductVariant, value: ProductVariant[typeof field]) => {
     const newVariants = [...formData.variants]
     newVariants[index] = { ...newVariants[index], [field]: value }
     setFormData((prev) => ({ ...prev, variants: newVariants }))

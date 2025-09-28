@@ -29,8 +29,10 @@ interface ProductFormData extends Omit<Product, "id" | "slug" | "createdAt" | "u
     sku: string
   }>
   images: string[]
-  featured: boolean
+  featured?: boolean
   status: "active" | "draft" | "archived"
+  slug?: string
+  comparePrice?: number
 }
 
 export default function EditProductPage({ params }: { params: { _id: string } }) {
@@ -61,7 +63,7 @@ export default function EditProductPage({ params }: { params: { _id: string } })
                 sku: `${productData.name.toUpperCase().slice(0, 3)}-001`,
               },
             ], // Default variant
-            images: [productData.image], // Use the main product image
+            images: [productData.images[0]], // Use the main product image
             featured: productData.featured,
             status: "active" as const,
           }
@@ -264,13 +266,13 @@ export default function EditProductPage({ params }: { params: { _id: string } })
                     id="comparePrice"
                     type="number"
                     step="0.01"
-                    value={product.originalPrice || ""}
-                    onChange={(e) => handleInputChange("originalPrice", Number.parseFloat(e.target.value))}
+                    value={product.comparePrice || ""}
+                    onChange={(e) => handleInputChange("comparePrice", Number.parseFloat(e.target.value))}
                   />
                 </div>
                 <div>
                   <Label htmlFor="category">Category</Label>
-                  <Select value={product.category} onValueChange={(value) => handleInputChange("category", value)}>
+                  <Select value={product.category.name} onValueChange={(value) => handleInputChange("category", value)}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -487,7 +489,7 @@ export default function EditProductPage({ params }: { params: { _id: string } })
 
               <div className="space-y-2">
                 <p className="text-sm font-medium">Product ID</p>
-                <p className="text-sm text-gray-500">{params.id}</p>
+                <p className="text-sm text-gray-500">{params._id}</p>
               </div>
 
               <div className="space-y-2">

@@ -281,10 +281,10 @@ export default function HelpCenterPage() {
                 {searchResults.hasResults ? (
                   <p>
                     Found {searchResults.topics.length + searchResults.faqs.length + searchResults.contacts.length}{" "}
-                    results for "{searchQuery}"
+                    results for &quot;{searchQuery}&quot;
                   </p>
                 ) : (
-                  <p>No results found for "{searchQuery}". Try different keywords or browse topics below.</p>
+                  <p>No results found for &quot;{searchQuery}&quot;. Try different keywords or browse topics below.</p>
                 )}
               </div>
             )}
@@ -506,7 +506,7 @@ export default function HelpCenterPage() {
               <Search className="h-16 w-16 text-gray-300 mx-auto mb-4" />
               <h2 className="text-xl font-semibold mb-2">No results found</h2>
               <p className="text-muted-foreground mb-6">
-                We couldn't find anything matching "{searchQuery}". Try using different keywords or browse our help
+                We couldn&apos;t find anything matching &quot;{searchQuery}&quot;. Try using different keywords or browse our help
                 topics below.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

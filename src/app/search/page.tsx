@@ -32,7 +32,7 @@ export default function SearchPage() {
     <div className="container mx-auto px-4 py-8 md:py-12">
       <h1 className="mb-2 text-2xl font-bold md:text-3xl">Search Results</h1>
       <p className="mb-8 text-slate-600">
-        {results.length} {results.length === 1 ? "result" : "results"} for "{query}"
+        {results.length} {results.length === 1 ? "result" : "results"} for &quot;{query}&quot;
       </p>
 
       {results.length > 0 ? (
@@ -41,7 +41,7 @@ export default function SearchPage() {
         <div className="rounded-lg border bg-slate-50 p-8 text-center">
           <h2 className="mb-2 text-lg font-medium">No products found</h2>
           <p className="text-slate-600">
-            Try adjusting your search or browse our products to find what you're looking for.
+            Try adjusting your search or browse our products to find what you&apos;re looking for.
           </p>
         </div>
       )}

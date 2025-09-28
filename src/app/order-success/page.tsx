@@ -34,8 +34,8 @@ export default function OrderSuccessPage() {
 
       <div className="mb-8 w-full max-w-md rounded-lg border bg-slate-50 p-6 text-left">
         <h2 className="mb-4 text-center text-lg font-semibold">Order Summary</h2>
-        <p className="mb-2">We've sent an order confirmation to your email with all the details.</p>
-        <p className="mb-4">You'll receive another notification when your order is ready for delivery.</p>
+        <p className="mb-2">We&apos;ve sent an order confirmation to your email with all the details.</p>
+        <p className="mb-4">You&apos;ll receive another notification when your order is ready for delivery.</p>
         <p className="font-medium">
           Payment Method: <span className="font-normal">Cash on Delivery</span>
         </p>

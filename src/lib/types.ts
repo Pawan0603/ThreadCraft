@@ -107,8 +107,10 @@ export interface User {
   createdAt: string
 }
 
-export interface Categories {
+export interface Category {
     _id: string;
     name: string;
     slug: string;
-}[]
+}
+
+export type Categories = Category[]

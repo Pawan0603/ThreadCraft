@@ -72,7 +72,7 @@ export default function ProductFilters({
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <SearchX className="h-12 w-12 text-gray-300 mb-2" />
             <p className="text-gray-500 font-medium">No categories found</p>
-            <p className="text-sm text-gray-400">No categories match "{searchQuery}"</p>
+            <p className="text-sm text-gray-400">No categories match &quot;{searchQuery}&quot;</p>
           </div>
         ) : (
           <div className="space-y-3">

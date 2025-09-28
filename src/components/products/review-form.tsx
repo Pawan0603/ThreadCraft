@@ -5,7 +5,7 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { addReview } from "@/lib/reviews"
+// import { addReview } from "@/lib/reviews"
 import StarRatingInput from "./star-rating-input"
 import { useAuth } from "@/components/auth/auth-context"
 import axios from "axios"
@@ -53,7 +53,7 @@ export default function ReviewForm({ productId, onReviewAdded }: ReviewFormProps
     }
 
     try {
-      let res = await axios.post("/api/reviews",
+      const res = await axios.post("/api/reviews",
         {
           productId,
           rating,

@@ -1,7 +1,6 @@
 'use client';
 import { Button } from "@/components/ui/button"
 import ProductGrid from "@/components/products/product-grid"
-import { getFeaturedProducts } from "@/lib/products"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import axios from "axios"
@@ -13,7 +12,7 @@ export default function Home() {
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
       try {
-        let res = await axios.get("/api/products", {
+        const res = await axios.get("/api/products", {
           params: {
             featured: true,
           },

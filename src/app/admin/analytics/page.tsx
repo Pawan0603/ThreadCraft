@@ -21,7 +21,7 @@ import { getAllUsers } from "@/lib/users"
 import type { Order } from "@/lib/types"
 
 export default function AdminAnalyticsPage() {
-  const [orders, setOrders] = useState<Order[]>([])
+  // const [orders, setOrders] = useState<Order[]>([])
   const [timeRange, setTimeRange] = useState("30")
   const [analytics, setAnalytics] = useState({
     revenue: {
@@ -55,7 +55,7 @@ export default function AdminAnalyticsPage() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      let token = localStorage.getItem("accessToken");
+      const token = localStorage.getItem("accessToken");
       setAccessToken(token);
     }
   }, []);
@@ -69,7 +69,7 @@ export default function AdminAnalyticsPage() {
     const allProducts = await getAllProducts()
     const allUsers = await getAllUsers(accessToken)
 
-    setOrders(allOrders)
+    // setOrders(allOrders)
 
     // Calculate analytics based on time range
     const now = new Date()
@@ -329,7 +329,7 @@ export default function AdminAnalyticsPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {analytics.revenueByMonth.map((month, index) => (
+                  {analytics.revenueByMonth.map((month) => (
                     <div key={month.month} className="flex items-center justify-between">
                       <span className="text-sm">{month.month}</span>
                       <div className="flex items-center gap-2">

@@ -14,14 +14,12 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useAuth } from "@/components/auth/auth-context"
 import ProtectedRoute from "@/components/auth/protected-route"
 import { getReviewsByUserId } from "@/lib/reviews"
-import { getOrdersByUserId } from "@/lib/orders"
 import type { Review, Order } from "@/lib/types"
 import StarRating from "@/components/products/star-rating"
 import OrderStatusBadge from "@/components/orders/order-status-badge"
 import Link from "next/link"
 import { User, MapPin, Bell, Shield, Trash2, Eye, EyeOff, CheckCircle, Edit } from "lucide-react"
 import axios from "axios"
-import { access } from "fs"
 
 export default function ProfilePage() {
   const { user, logout } = useAuth()
@@ -104,7 +102,7 @@ export default function ProfilePage() {
     if (!user) return;
 
     try {
-      let res = await axios.get("/api/orders", {
+      const res = await axios.get("/api/orders", {
         params: {
           userId: user._id,
           page: 1,
@@ -292,7 +290,7 @@ export default function ProfilePage() {
                 </div>
               ) : (
                 <div className="p-8 text-center">
-                  <p className="text-gray-500">You haven't placed any orders yet.</p>
+                  <p className="text-gray-500">You haven&apos;t placed any orders yet.</p>
                   <Link href="/products">
                     <Button className="mt-4">Start Shopping</Button>
                   </Link>
@@ -324,7 +322,7 @@ export default function ProfilePage() {
                 </div>
               ) : (
                 <div className="p-8 text-center">
-                  <p className="text-gray-500">You haven't written any reviews yet.</p>
+                  <p className="text-gray-500">You haven&apos;t written any reviews yet.</p>
                   <Link href="/products">
                     <Button className="mt-4">Browse Products</Button>
                   </Link>

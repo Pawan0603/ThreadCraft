@@ -87,7 +87,7 @@ export default function AdminOrdersPage() {
 
   const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
     try {
-      let res = await axios.put(`/api/orders/${orderId}`, { status: newStatus }, {
+      await axios.put(`/api/orders/${orderId}`, { status: newStatus }, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
@@ -129,24 +129,24 @@ export default function AdminOrdersPage() {
     }
   }
 
-  const getStatusBadgeVariant = (status: OrderStatus) => {
-    switch (status) {
-      case "Pending":
-        return "outline"
-      case "Processing":
-        return "secondary"
-      case "Shipped":
-        return "default"
-      case "Out for Delivery":
-        return "default"
-      case "Delivered":
-        return "success"
-      case "Cancelled":
-        return "destructive"
-      default:
-        return "outline"
-    }
-  }
+  // const getStatusBadgeVariant = (status: OrderStatus) => {
+  //   switch (status) {
+  //     case "Pending":
+  //       return "outline"
+  //     case "Processing":
+  //       return "secondary"
+  //     case "Shipped":
+  //       return "default"
+  //     case "Out for Delivery":
+  //       return "default"
+  //     case "Delivered":
+  //       return "success"
+  //     case "Cancelled":
+  //       return "destructive"
+  //     default:
+  //       return "outline"
+  //   }
+  // }
 
   const exportOrders = () => {
     // In a real app, this would generate and download a CSV/Excel file

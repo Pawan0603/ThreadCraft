@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import ProductGrid from "@/components/products/product-grid"
 import ProductFilters from "@/components/products/product-filters"
 import MobileFilterDrawer from "@/components/products/mobile-filter-drawer"
-import { getAllProducts } from "@/lib/products"
 import type { Categories, Product } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { SlidersHorizontal } from "lucide-react"
@@ -37,7 +36,7 @@ export default function ProductsPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        let response = await axios.get('/api/products'); // Adjust the endpoint as needed
+        const response = await axios.get('/api/products'); // Adjust the endpoint as needed
         console.log(response.data.products);
         setAllProducts(response.data.products);
         setFilteredProducts(response.data.products);
@@ -163,7 +162,7 @@ export default function ProductsPage() {
           {filteredProducts.length === 0 && (
             <div className="mt-8 rounded-lg border bg-slate-50 p-8 text-center">
               <h2 className="mb-2 text-lg font-medium">No products found</h2>
-              <p className="text-slate-600">Try adjusting your filters to find what you're looking for.</p>
+              <p className="text-slate-600">Try adjusting your filters to find what you&apos;re looking for.</p>
             </div>
           )}
         </div>

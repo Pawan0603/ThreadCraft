@@ -4,7 +4,7 @@ import User from "@/lib/models/User"
 import { withAuth, type AuthenticatedRequest } from "@/lib/auth/middleware"
 
 // GET /api/users/profile - Get all users (admin only) 
-async function getAllUsers(req: AuthenticatedRequest) {
+async function getAllUsers() {
   try {
     await connectDB()
 

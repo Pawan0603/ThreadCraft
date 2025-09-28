@@ -110,7 +110,7 @@ const products: Product[] = [
 export async function getAllProducts(): Promise<Product[]> {
   // return products
   try {
-    let res = await axios.get("/api/products")
+    const res = await axios.get("/api/products")
     console.log("Fetched products:", res.data);
     return res.data.products as Product[];
   } catch (error) {
