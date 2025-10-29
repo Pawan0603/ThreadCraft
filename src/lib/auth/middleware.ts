@@ -5,8 +5,12 @@ export interface AuthenticatedRequest extends NextRequest {
   user?: JWTPayload
 }
 
-export function withAuth(handler: (req: AuthenticatedRequest, context: any) => Promise<NextResponse>) {
-  return async (req: AuthenticatedRequest, context: any): Promise<NextResponse> => {
+interface RouteContext {
+  params?: Record<string, string | string[]>;
+}
+
+export function withAuth(handler: (req: AuthenticatedRequest, context: RouteContext) => Promise<NextResponse>) {
+  return async (req: AuthenticatedRequest, context: RouteContext): Promise<NextResponse> => {
     try {
       const authHeader = req.headers.get("authorization")
       console.log("Authorization Header:", authHeader);
@@ -30,8 +34,8 @@ export function withAuth(handler: (req: AuthenticatedRequest, context: any) => P
   }
 }
 
-export function withAdminAuth(handler: (req: AuthenticatedRequest, context: any) => Promise<NextResponse>) {
-  return withAuth(async (req: AuthenticatedRequest, context: any): Promise<NextResponse> => {
+export function withAdminAuth(handler: (req: AuthenticatedRequest, context: RouteContext) => Promise<NextResponse>) {
+  return withAuth(async (req: AuthenticatedRequest, context: RouteContext): Promise<NextResponse> => {
     if (!req.user || !["admin", "super_admin"].includes(req.user.role)) {
       return NextResponse.json({ error: "Admin access required" }, { status: 403 })
     }

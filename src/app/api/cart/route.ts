@@ -71,7 +71,7 @@ async function addToCart(req: AuthenticatedRequest) {
 
     // Check stock if size/color specified
     if (size || color) {
-      const variant = product.variants.find((v: any) => (!size || v.size === size) && (!color || v.color === color))
+      const variant = product.variants.find((v: { size: string; color: string; stock: number }) => (!size || v.size === size) && (!color || v.color === color))
       if (!variant || variant.stock < quantity) {
         return NextResponse.json({ error: "Insufficient stock" }, { status: 400 })
       }
@@ -84,7 +84,7 @@ async function addToCart(req: AuthenticatedRequest) {
 
     // Check if item already exists in cart
     const existingItemIndex = cart.items.findIndex(
-      (item: any) => item.product.toString() === productId && item.size === size && item.color === color,
+      (item: { product: string; size: string; color: string }) => item.product.toString() === productId && item.size === size && item.color === color,
     )
 
     if (existingItemIndex > -1) {
@@ -130,10 +130,10 @@ async function updateCart(req: AuthenticatedRequest) {
 
     if (quantity === 0) {
       // Remove item
-      cart.items = cart.items.filter((item: any) => item._id.toString() !== itemId)
+      cart.items = cart.items.filter((item: { _id: string }) => item._id.toString() !== itemId)
     } else {
       // Update quantity
-      const item = cart.items.find((item: any) => item._id.toString() === itemId)
+      const item = cart.items.find((item: { _id: string }) => item._id.toString() === itemId)
       if (item) {
         item.quantity = quantity
       }
