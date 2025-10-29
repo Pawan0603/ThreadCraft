@@ -22,7 +22,15 @@ export async function GET(req: NextRequest) {
     const inStock = searchParams.get("inStock")
 
     // Build query
-    const query: any = { status: "active", visibility: "public" }
+    const query: { 
+      status: string; 
+      visibility: string; 
+      category?: string;
+      $or?: { name?: { $regex: string; $options: string }; description?: { $regex: string; $options: string }; tags?: { $in: RegExp[] } }[];
+      price?: { $gte?: number; $lte?: number };
+      featured?: boolean;
+      "variants.stock"?: { $gt: number };
+     } = { status: "active", visibility: "public" }
 
     if (category) {
       query.category = category
@@ -52,7 +60,7 @@ export async function GET(req: NextRequest) {
 
     // Execute query with pagination
     const skip = (page - 1) * limit
-    const sortOptions: any = {}
+    const sortOptions: { [key: string]: 1 | -1 } = {}
     sortOptions[sortBy] = sortOrder === "desc" ? -1 : 1
 
 

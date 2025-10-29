@@ -23,7 +23,12 @@ export async function GET(req: NextRequest) {
     }
 
     // Build search query
-    const searchQuery: any = {
+    const searchQuery: {
+      isActive: boolean;
+      $or: { name?: { $regex: string; $options: string }; description?: { $regex: string; $options: string }; tags?: { $in: RegExp[] } }[];
+      category?: string;
+      price?: { $gte?: number; $lte?: number };
+    } = {
       isActive: true,
       $or: [
         { name: { $regex: query, $options: "i" } },
@@ -43,7 +48,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Sorting
-    let sortOptions: any = {}
+    let sortOptions: {[key: string]: 1 | -1} = {}
     switch (sortBy) {
       case "price_low":
         sortOptions = { price: 1 }

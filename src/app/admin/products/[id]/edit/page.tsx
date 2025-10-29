@@ -91,7 +91,7 @@ export default function EditProductPage({ params }: { params: { _id: string } })
     setSaving(false)
   }
 
-  const handleInputChange = (field: keyof ProductFormData, value: any) => {
+  const handleInputChange = <K extends keyof ProductFormData>(field: K, value: ProductFormData[K]) => { // last commit change type for production error
     if (!product) return
     setProduct({ ...product, [field]: value })
   }
@@ -133,7 +133,11 @@ export default function EditProductPage({ params }: { params: { _id: string } })
     setProduct({ ...product, variants: [...product.variants, newVariant] })
   }
 
-  const handleVariantChange = (index: number, field: string, value: any) => {
+  const handleVariantChange = (
+    index: number,
+    field: keyof ProductFormData["variants"][number],
+    value: string | number
+  ) => {
     if (!product) return
     const updatedVariants = [...product.variants]
     updatedVariants[index] = { ...updatedVariants[index], [field]: value }

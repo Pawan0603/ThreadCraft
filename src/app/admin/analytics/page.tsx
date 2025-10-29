@@ -18,7 +18,7 @@ import {
 import { getAllOrders } from "@/lib/orders"
 import { getAllProducts } from "@/lib/products"
 import { getAllUsers } from "@/lib/users"
-import type { Order } from "@/lib/types"
+// import type { Order } from "@/lib/types"
 
 export default function AdminAnalyticsPage() {
   // const [orders, setOrders] = useState<Order[]>([])

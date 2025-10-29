@@ -21,7 +21,7 @@ async function getCart(req: AuthenticatedRequest) {
     let subtotal = 0
     const validItems = []
 
-    for (const item of cart.items) {
+    for (const item of cart!.items) {
       if (item.product) {
         const itemTotal = item.product.price * item.quantity
         subtotal += itemTotal

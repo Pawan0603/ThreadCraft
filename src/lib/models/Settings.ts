@@ -3,7 +3,7 @@ import mongoose, { type Document, Schema } from "mongoose"
 export interface ISettings extends Document {
   _id: string
   key: string
-  value: any
+  value: Record<string, unknown> | string | number | boolean | unknown[];
   type: "string" | "number" | "boolean" | "object" | "array"
   category: "general" | "payment" | "shipping" | "email" | "sms" | "social" | "seo" | "analytics"
   description?: string

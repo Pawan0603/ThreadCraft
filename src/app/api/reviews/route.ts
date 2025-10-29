@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
     const page = Number.parseInt(searchParams.get("page") || "1")
     const limit = Number.parseInt(searchParams.get("limit") || "10")
 
-    const query: any = {}
+    const query: { product?: string } = {}
     if (productId) {
       query.product = productId
     }

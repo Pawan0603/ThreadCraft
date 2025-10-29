@@ -15,8 +15,8 @@ async function getOrder(req: AuthenticatedRequest, context: { params: { id: stri
     }
 
     const { id } = context.params;
-    
-    const query: any = { orderNumber: id }
+
+    const query: { orderNumber: string; user?: string } = { orderNumber: id }
     const isAdmin = ["admin", "super_admin"].includes(req.user!.role)
 
     if (!isAdmin) {
@@ -48,7 +48,7 @@ async function updateOrder(req: AuthenticatedRequest, context: { params: { id: s
     }
     const { status, trackingNumber, notes } = await req.json()
 
-    const updateData: any = { updatedAt: new Date() }
+    const updateData: { updatedAt: Date; status?: string; trackingNumber?: string; $push?: { statusHistory: { status: string; timestamp: Date; notes: string } } } = { updatedAt: new Date() }
 
     if (status) {
       updateData.status = status

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import connectDB from "@/lib/database/connection"
 import User from "@/lib/models/User"
-import { withAuth, type AuthenticatedRequest } from "@/lib/auth/middleware"
+import { withAuth } from "@/lib/auth/middleware"
 
 // GET /api/users/profile - Get all users (admin only) 
 async function getAllUsers() {

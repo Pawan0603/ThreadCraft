@@ -6,7 +6,7 @@ export interface INotification extends Document {
   type: "order_update" | "product_back_in_stock" | "price_drop" | "review_reminder" | "marketing" | "system"
   title: string
   message: string
-  data?: Record<string, any>
+  data?: Record<string, unknown>
   channels: {
     email: boolean
     sms: boolean

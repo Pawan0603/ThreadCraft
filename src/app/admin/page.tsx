@@ -30,7 +30,7 @@ import type { Product, Order } from "@/lib/types"
 export default function AdminDashboard() {
   const [products, setProducts] = useState<Product[]>([])
   const [orders, setOrders] = useState<Order[]>([])
-  const [users, setUsers] = useState([])
+  // const [users, setUsers] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [notification, setNotification] = useState<string | null>(null)
   const [stats, setStats] = useState({

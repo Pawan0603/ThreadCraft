@@ -79,7 +79,7 @@ async function removeFromWishlist(req: AuthenticatedRequest) {
       return NextResponse.json({ error: "Wishlist not found" }, { status: 404 })
     }
 
-    wishlist.items = wishlist.items.filter((item: any) => item.toString() !== productId)
+    wishlist.items = wishlist.items.filter((item: string) => item.toString() !== productId)
     wishlist.updatedAt = new Date()
     await wishlist.save()
 

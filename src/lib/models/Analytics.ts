@@ -19,7 +19,7 @@ export interface IAnalytics extends Document {
     os?: string
     browser?: string
   }
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
   timestamp: Date
 }
 

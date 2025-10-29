@@ -70,17 +70,34 @@ export default function AdminProductsPage() {
 
     // Apply sorting
     filtered.sort((a, b) => {
-      let aValue: any = a[sortBy as keyof Product]
-      let bValue: any = b[sortBy as keyof Product]
+      let aValue = a[sortBy as keyof Product] as string | number | boolean | { name: string } | undefined
+      let bValue = b[sortBy as keyof Product] as string | number | boolean | { name: string } | undefined
 
-      if (typeof aValue === "string") {
+      // Handle sorting by category (object with name)
+      if (sortBy === "category" && typeof aValue === "object" && aValue && "name" in aValue && typeof bValue === "object" && bValue && "name" in bValue) {
+        const aName = (aValue as { name: string }).name.toLowerCase()
+        const bName = (bValue as { name: string }).name.toLowerCase()
+        if (sortOrder === "asc") {
+          return aName < bName ? -1 : aName > bName ? 1 : 0
+        } else {
+          return aName > bName ? -1 : aName < bName ? 1 : 0
+        }
+      }
+
+      if (typeof aValue === "string" && typeof bValue === "string") {
         aValue = aValue.toLowerCase()
         bValue = bValue.toLowerCase()
       }
 
       if (sortOrder === "asc") {
+        if (aValue === undefined && bValue === undefined) return 0
+        if (aValue === undefined) return 1
+        if (bValue === undefined) return -1
         return aValue < bValue ? -1 : aValue > bValue ? 1 : 0
       } else {
+        if (aValue === undefined && bValue === undefined) return 0
+        if (aValue === undefined) return 1
+        if (bValue === undefined) return -1
         return aValue > bValue ? -1 : aValue < bValue ? 1 : 0
       }
     })

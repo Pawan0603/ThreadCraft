@@ -16,7 +16,7 @@ async function getOrders(req: AuthenticatedRequest) {
     const isAdmin = ["admin", "super_admin"].includes(req.user!.role)
 
     // Build query
-    const query: any = {}
+    const query: { user?: string; status?: string } = {}
 
     if (!isAdmin) {
       query.user = req.user!.userId // Only get user's own orders
@@ -91,7 +91,7 @@ async function createOrder(req: AuthenticatedRequest) {
 
     // Validate products and calculate totals
     let subtotal = 0
-    const orderItems: any[] = []
+    const orderItems: { product: string; name: string; slug: string; image: string; price: number; quantity: number; size: string; color: string; sku: string; total: number }[] = []
 
     for (const item of items) {
       const product = await Product.findById(item.product)
@@ -101,9 +101,9 @@ async function createOrder(req: AuthenticatedRequest) {
       // Find variant by size (and color if provided)
       let variant
       if (item.color) {
-      variant = product.variants.find((v: any) => v.size === item.size && v.color === item.color)
+      variant = product.variants.find((v: { size: string; color: string }) => v.size === item.size && v.color === item.color)
       } else {
-      variant = product.variants.find((v: any) => v.size === item.size)
+      variant = product.variants.find((v: { size: string }) => v.size === item.size)
       }
       if (!variant || variant.stock < item.quantity) {
       return NextResponse.json({ error: `Insufficient stock for ${product.name}` }, { status: 400 })
